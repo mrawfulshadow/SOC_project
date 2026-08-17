@@ -16,6 +16,7 @@ Microservices-based architecture built with Spring Boot, API Gateway, Auth Servi
 
 ---
 
+
 ##  API Gateway & Auth Service (Student 1 Details)
 
 Student 1 is responsible for the single entry point (**API Gateway**) and centralized authentication (**Auth Service**).
@@ -86,6 +87,7 @@ curl -X GET http://localhost:8080/api/payments/history/5 \
 
 ---
 
+
 ##  Payment Service (Student 4 Details)
 
 The **Payment Service** processes customer payment transactions, stores transaction history, manages payment statuses (`COMPLETED`, `FAILED`, `REFUNDED`), and handles refund processing.
@@ -142,7 +144,7 @@ curl -X POST http://localhost:8083/api/payments/refund/1 \
   -d '{ "reason": "Customer cancelled order" }'
 ```
 
-### 🚀 How to Run Payment Service Locally
+###  How to Run Payment Service Locally
 
 ```bash
 cd payment-service
@@ -150,6 +152,7 @@ cd payment-service
 ```
 
 ---
+
 
 ##  Notification Service (Student 5 Details)
 
@@ -167,7 +170,7 @@ Every direct request to the Notification Service endpoints must include the `X-A
 
 *Requests missing or providing an invalid API Key will receive a `401 Unauthorized` HTTP response.*
 
-### 🛠️ REST API Endpoints
+###  REST API Endpoints
 | HTTP Method | Endpoint | Description | Header Required |
 |---|---|---|---|
 | `POST` | `/api/notifications/email` | Send email notification | `X-API-KEY: notification-secret-key-123` |
