@@ -4,7 +4,7 @@ Microservices-based architecture built with Spring Boot, API Gateway, Auth Servi
 
 ---
 
-## 📌 Team Member Work Breakdown Matrix
+##  Team Member Work Breakdown Matrix
 
 | Student | Microservice / Role | Key Responsibilities | Port | Swagger UI URL |
 |---|---|---|:---:|---|
@@ -16,17 +16,17 @@ Microservices-based architecture built with Spring Boot, API Gateway, Auth Servi
 
 ---
 
-## 🔑 Step 3: API Gateway & Auth Service (Student 1 Details)
+##  Step 3: API Gateway & Auth Service (Student 1 Details)
 
 Student 1 is responsible for the single entry point (**API Gateway**) and centralized authentication (**Auth Service**).
 
-### 🛡️ 1. Auth Service Details
+###  1. Auth Service Details
 - **Port:** `8084`
 - **Interactive Swagger UI:** [http://localhost:8084/swagger-ui.html](http://localhost:8084/swagger-ui.html)
 - **Database:** H2 In-Memory Database (`jdbc:h2:mem:authdb`)
 - **Security:** Spring Security with BCrypt Password Hashing and JJWT (JSON Web Token) generation & validation.
 
-#### 🛠️ Auth Service REST API Endpoints
+####  Auth Service REST API Endpoints
 
 | HTTP Method | Endpoint | Description | Authorization Required |
 |---|---|---|---|
@@ -36,7 +36,7 @@ Student 1 is responsible for the single entry point (**API Gateway**) and centra
 
 ---
 
-### 🌐 2. API Gateway Details
+###  2. API Gateway Details
 - **Port:** `8080` (Main System Entry Point)
 - **Framework:** Spring Cloud Gateway (Reactive WebFlux)
 - **Key Features:**
@@ -52,7 +52,7 @@ Student 1 is responsible for the single entry point (**API Gateway**) and centra
 
 ---
 
-### 🧪 Example API Gateway Testing Flow (cURL)
+###  Example API Gateway Testing Flow (cURL)
 
 **Step A: Register a New User**
 ```bash
@@ -86,23 +86,23 @@ curl -X GET http://localhost:8080/api/payments/history/5 \
 
 ---
 
-## 💳 Payment Service (Student 4 Details)
+##  Payment Service (Student 4 Details)
 
 The **Payment Service** processes customer payment transactions, stores transaction history, manages payment statuses (`COMPLETED`, `FAILED`, `REFUNDED`), and handles refund processing.
 
-### 🌐 Microservice Details
+###  Microservice Details
 - **Port:** `8083`
 - **Interactive Swagger UI:** [http://localhost:8083/swagger-ui/index.html](http://localhost:8083/swagger-ui/index.html)
 - **Database:** H2 In-Memory Database (`jdbc:h2:mem:paymentdb`)
 
-### 🔐 API Key Security Verification
+###  API Key Security Verification
 Every direct request to the Payment Service endpoints must include the `X-API-KEY` header:
 - **Header Key:** `X-API-KEY`
 - **Header Value:** `payment-secret-key-123`
 
 *Requests missing or providing an invalid API Key will receive a `401 Unauthorized` HTTP response.*
 
-### 🛠️ REST API Endpoints
+###  REST API Endpoints
 
 | HTTP Method | Endpoint | Description | Header Required |
 |---|---|---|---|
@@ -112,7 +112,7 @@ Every direct request to the Payment Service endpoints must include the `X-API-KE
 | `GET` | `/api/payments/transaction/{transactionId}` | Get payment details by transaction ID | `X-API-KEY: payment-secret-key-123` |
 | `POST` | `/api/payments/refund/{id}` | Process refund for an existing payment | `X-API-KEY: payment-secret-key-123` |
 
-### 🧪 Example API Requests (cURL)
+###  Example API Requests (cURL)
 
 **1. Process Payment:**
 ```bash
@@ -151,16 +151,16 @@ cd payment-service
 
 ---
 
-## 🔔 Notification Service (Student 5 Details)
+##  Notification Service (Student 5 Details)
 
 The **Notification Service** handles sending order status updates and receipts via Email and SMS.
 
-### 🌐 Microservice Details
+###  Microservice Details
 - **Port:** `8085`
 - **Interactive Swagger UI:** [http://localhost:8085/swagger-ui/index.html](http://localhost:8085/swagger-ui/index.html)
 - **Database:** H2 In-Memory Database (`jdbc:h2:mem:notificationdb`)
 
-### 🔐 API Key Security Verification
+###  API Key Security Verification
 Every direct request to the Notification Service endpoints must include the `X-API-KEY` header:
 - **Header Key:** `X-API-KEY`
 - **Header Value:** `notification-secret-key-123`
@@ -175,7 +175,7 @@ Every direct request to the Notification Service endpoints must include the `X-A
 | `GET` | `/api/notifications/user/{userId}` | Get notification history for user | `X-API-KEY: notification-secret-key-123` |
 | `GET` | `/api/notifications/{id}` | Get notification details by ID | `X-API-KEY: notification-secret-key-123` |
 
-### 🚀 How to Run Notification Service Locally
+###  How to Run Notification Service Locally
 ```bash
 cd notification-service
 .\mvnw spring-boot:run
@@ -183,7 +183,7 @@ cd notification-service
 
 ---
 
-## 🐳 Docker Deployment (Entire Ecosystem)
+##  Docker Deployment (Entire Ecosystem)
 
 To build and run all microservices with Docker Compose:
 
