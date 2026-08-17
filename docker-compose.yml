@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - AUTH_SERVICE_URL=http://auth-service:8084
+      - PRODUCT_SERVICE_URL=http://product-service:8081
+      - PAYMENT_SERVICE_URL=http://payment-service:8083
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8085
+    depends_on:
+      - auth-service
+      - product-service
+      - payment-service
+      - notification-service
+    restart: always
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    restart: always
+
   product-service:
     build:
       context: ./product-service
