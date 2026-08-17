@@ -16,7 +16,7 @@ Microservices-based architecture built with Spring Boot, API Gateway, Auth Servi
 
 ---
 
-##  Step 3: API Gateway & Auth Service (Student 1 Details)
+##  API Gateway & Auth Service (Student 1 Details)
 
 Student 1 is responsible for the single entry point (**API Gateway**) and centralized authentication (**Auth Service**).
 
