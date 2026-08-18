@@ -1,0 +1,7 @@
+com\soc\notificationservice\model\Notification.class
+com\soc\notificationservice\config\SwaggerConfig.class
+com\soc\notificationservice\controller\NotificationController.class
+com\soc\notificationservice\repository\NotificationRepository.class
+com\soc\notificationservice\model\Notification$NotificationBuilder.class
+com\soc\notificationservice\config\ApiKeyFilter.class
+com\soc\notificationservice\NotificationServiceApplication.class
