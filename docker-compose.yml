@@ -12,11 +12,13 @@ services:
       - SPRING_PROFILES_ACTIVE=default
       - AUTH_SERVICE_URL=http://auth-service:8084
       - PRODUCT_SERVICE_URL=http://product-service:8081
+      - ORDER_SERVICE_URL=http://order-service:8082
       - PAYMENT_SERVICE_URL=http://payment-service:8083
       - NOTIFICATION_SERVICE_URL=http://notification-service:8085
     depends_on:
       - auth-service
       - product-service
+      - order-service
       - payment-service
       - notification-service
     restart: always
@@ -43,6 +45,29 @@ services:
       - SPRING_PROFILES_ACTIVE=default
     restart: always
 
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATA_MONGODB_URI=mongodb://order-mongodb:27017/order_db
+    depends_on:
+      - order-mongodb
+    restart: always
+
+  order-mongodb:
+    image: mongo:7.0
+    container_name: order-mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - order_mongodb_data:/data/db
+
   payment-service:
     build:
       context: ./payment-service
@@ -64,3 +89,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=default
     restart: always
+
+volumes:
+  order_mongodb_data:
+    driver: local
