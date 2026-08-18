@@ -1,120 +1,142 @@
-# SOC_project
-new repo
-hellow
-## 📦 Student 2 Contribution: Product Catalog Service
+# 🛒 Online E-Commerce & Delivery System (SOC Microservices)
 
-### 📌 Overview
-The **Product Catalog Service** is an independent microservice responsible for managing product inventory and details. It provides secure REST APIs, uses an in-memory database for fast operations, and is containerized for easy deployment.
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x%20%2F%204.x-brightgreen?style=for-the-badge&logo=springboot)
+![Spring Cloud Gateway](https://img.shields.io/badge/Spring_Cloud-Gateway-blue?style=for-the-badge&logo=spring)
+![Security](https://img.shields.io/badge/Security-JWT%20%2B%20API%20Keys-red?style=for-the-badge&logo=jsonwebtokens)
+![Docker](https://img.shields.io/badge/Docker-Compose-blue?style=for-the-badge&logo=docker)
+![Swagger](https://img.shields.io/badge/OpenAPI-Swagger_UI-green?style=for-the-badge&logo=swagger)
 
----
-
-### 🛠️ Tech Stack
-* **Framework:** Spring Boot 4.0.7
-* **Language:** Java 17
-* **Database:** H2 In-Memory Database
-* **ORM:** Spring Data JPA
-* **Documentation:** Springdoc OpenAPI (Swagger UI)
-* **Containerization:** Docker
+An enterprise-grade, microservices-based **Online E-Commerce & Delivery Platform** built with **Java 17**, **Spring Boot**, **Spring Cloud Gateway**, **JWT Authentication**, and **Docker**.
 
 ---
 
-### 📂 Service Directory Structure
-```text
-product-service/
-├── src/main/java/com/soc/productservice/
-│   ├── config/          # ApiKeyFilter for Security
-│   ├── controller/      # REST API Endpoints
-│   ├── model/           # Product Entity
-│   ├── repository/      # JPA Repository Interface
-│   └── service/         # Business Logic Layer
-├── src/main/resources/  # Application Configuration
-└── Dockerfile           # Docker Deployment Configuration
+## 📐 System Architecture
+
+The ecosystem uses an **API Gateway pattern** where all external client requests pass through a centralized Spring Cloud Gateway entry point (Port `8080`). The Gateway validates user JWT tokens, enforces rate limiting, and forwards authorized requests to independent downstream microservices while auto-injecting internal `X-API-KEY` headers.
+
+```mermaid
+flowchart TD
+    Client[📱 Client App / Postman / Frontend]
+    
+    subgraph GatewayLayer ["🚪 Gateway Layer"]
+        Gateway["⚙️ API Gateway (Port 8080)<br/>• Dynamic Routing<br/>• JWT Gatekeeper<br/>• X-API-KEY Auto-Inject<br/>• Rate Limiting (60 req/min)"]
+    end
+
+    subgraph CoreServices ["🧱 Microservices Ecosystem"]
+        AuthService["🔐 Auth Service (Port 8084)<br/>• JWT Generation & Validation<br/>• User Registration & Login"]
+        ProductService["📦 Product Service (Port 8081)<br/>• Catalog & Inventory CRUD<br/>• Protected via X-API-KEY"]
+        OrderService["🛒 Order Service (Port 8082)<br/>• Order Placement & Lifecycle<br/>• Delivery Tracking & Status"]
+        PaymentService["💳 Payment Service (Port 8083)<br/>• Transaction & Refunds<br/>• Protected via X-API-KEY"]
+        NotificationService["🔔 Notification Service (Port 8085)<br/>• Email & SMS Alerts<br/>• Protected via X-API-KEY"]
+    end
+
+    Client -->|HTTP / REST| Gateway
+    Gateway -->|/api/auth/**| AuthService
+    Gateway -->|/api/products/**| ProductService
+    Gateway -->|/api/orders/**| OrderService
+    Gateway -->|/api/payments/**| PaymentService
+    Gateway -->|/api/notifications/**| NotificationService
 ```
 
-### 🔑 Security & Authorization
-This service is protected using custom HTTP header authentication:
-* **Header Name:** `X-API-KEY`
-* **Header Value:** `PRODUCT-SERVICE-SECRET-KEY`
-* **Behavior:** Rejects unauthorized requests with 401 Unauthorized.
-* **Public Exemption:** Swagger UI (`/swagger-ui.html`) and API Docs (`/api-docs`) remain accessible without API keys.
-
-### 🚀 REST API Endpoints
-
-| Method | Endpoint | Description | Authentication |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/products` | Fetch all products | `X-API-KEY` Required |
-| `GET` | `/products/{id}` | Fetch a single product by ID | `X-API-KEY` Required |
-| `POST` | `/products` | Add a new product | `X-API-KEY` Required |
-| `DELETE` | `/products/{id}` | Delete a product by ID | `X-API-KEY` Required |
-| `GET` | `/swagger-ui.html` | Interactive API Documentation | Public |
-
-### 🐳 Docker Configuration
-The service is packaged using Docker on port 8081:
-
-```dockerfile
-FROM openjdk:17-jdk-slim
-WORKDIR /app
-COPY target/*.jar app.jar
-EXPOSE 8081
-ENTRYPOINT ["java", "-jar", "app.jar"]
-# Online E-Commerce & Delivery System (SOC Project)
-
-Microservices-based architecture built with Spring Boot, API Gateway, Auth Service (JWT), Docker, and Swagger.
-
 ---
 
-##  Team Member Work Breakdown Matrix
+## 👥 Team Work Breakdown Matrix
 
-| Student | Microservice / Role | Key Responsibilities | Port | Swagger UI URL |
+| Student | Microservice / Role | Key Responsibilities | Port | Interactive Swagger UI |
 |---|---|---|:---:|---|
-| **Student 1 (Lead)** | API Gateway & Auth Service | Gateway Routing, JWT Auth, API Key Auto-Inject, CORS, Rate Limiting | 8080 / 8084 | `http://localhost:8084/swagger-ui.html` |
-| **Student 2** | Product Service | Product & Category CRUD, Inventory | 8081 | `http://localhost:8081/swagger-ui/index.html` |
-| **Student 3** | Order Service | Order Management & Cart | 8082 | `http://localhost:8082/swagger-ui/index.html` |
-| **Student 4** | Payment Service | Transaction Processing & Payment History | 8083 | `http://localhost:8083/swagger-ui/index.html` |
-| **Student 5** | Notification Service | Email & SMS Order Notifications | 8085 | `http://localhost:8085/swagger-ui/index.html` |
+| **Student 1 (Lead)** | **API Gateway & Auth Service** | Gateway Routing, JWT Gatekeeper Filter, API Key Auto-Injection, CORS, Rate Limiting, User Auth & Registration | `8080` / `8084` | [Auth Service Swagger](http://localhost:8084/swagger-ui.html) |
+| **Student 2** | **Product Catalog Service** | Product & Category CRUD, Inventory Management, `X-API-KEY` Security Filter | `8081` | [Product Service Swagger](http://localhost:8081/swagger-ui.html) |
+| **Student 3** | **Order Service** | Order Placement, Lifecycle Tracking (`PENDING` ➔ `DELIVERED`), Webhook Updates | `8082` | [Order Service Swagger](http://localhost:8082/swagger-ui.html) |
+| **Student 4** | **Payment Service** | Transaction Processing, Payment History, Refund Processing, `X-API-KEY` Security | `8083` | [Payment Service Swagger](http://localhost:8083/swagger-ui/index.html) |
+| **Student 5** | **Notification Service** | Email & SMS Notifications, Dispatch Logs, `X-API-KEY` Security Filter | `8085` | [Notification Service Swagger](http://localhost:8085/swagger-ui/index.html) |
 
 ---
 
+## 🚀 Microservices Overview & REST API Specifications
 
-##  API Gateway & Auth Service (Student 1 Details)
-
-Student 1 is responsible for the single entry point (**API Gateway**) and centralized authentication (**Auth Service**).
-
-###  1. Auth Service Details
-- **Port:** `8084`
-- **Interactive Swagger UI:** [http://localhost:8084/swagger-ui.html](http://localhost:8084/swagger-ui.html)
-- **Database:** H2 In-Memory Database (`jdbc:h2:mem:authdb`)
-- **Security:** Spring Security with BCrypt Password Hashing and JJWT (JSON Web Token) generation & validation.
-
-####  Auth Service REST API Endpoints
-
-| HTTP Method | Endpoint | Description | Authorization Required |
-|---|---|---|---|
-| `POST` | `/api/auth/register` | Register a new user account | None (Public) |
-| `POST` | `/api/auth/login` | Authenticate user and receive JWT token | None (Public) |
-| `GET` | `/api/auth/validate` | Validate a JWT token (`?token=...`) | None (Public) |
-
----
-
-###  2. API Gateway Details
-- **Port:** `8080` (Main System Entry Point)
-- **Framework:** Spring Cloud Gateway (Reactive WebFlux)
+### 1. 🚪 API Gateway (`Port 8080`)
+The single entry point for all client requests.
+- **Dynamic Routing Rules:**
+  - `/api/auth/**` ➔ Auth Service (`http://localhost:8084`)
+  - `/api/products/**` ➔ Product Service (`http://localhost:8081`)
+  - `/api/orders/**` ➔ Order Service (`http://localhost:8082`)
+  - `/api/payments/**` ➔ Payment Service (`http://localhost:8083`)
+  - `/api/notifications/**` ➔ Notification Service (`http://localhost:8085`)
 - **Key Features:**
-  1. **Dynamic Routing:**
-     - `/api/auth/**` ➔ Auth Service (`http://localhost:8084`)
-     - `/api/products/**` ➔ Product Service (`http://localhost:8081`)
-     - `/api/orders/**` ➔ Order Service (`http://localhost:8082`)
-     - `/api/payments/**` ➔ Payment Service (`http://localhost:8083`)
-     - `/api/notifications/**` ➔ Notification Service (`http://localhost:8085`)
-  2. **JWT Authentication Gateway Filter:** Validates the `Authorization: Bearer <token>` header for protected microservice endpoints. Extracts user info and injects `X-User-Name` & `X-User-Role` downstream.
-  3. **Auto-Inject X-API-KEY Filter:** Automatically injects each downstream service's specific `X-API-KEY` header (`PRODUCT-SERVICE-SECRET-KEY`, `payment-secret-key-123`, `notification-secret-key-123`, etc.) so clients do not need internal keys.
-  4. **CORS & Rate Limiting:** Global CORS configuration for frontend clients + in-memory rate limiter (60 req/min per IP) to protect against DDoS/abuse.
+  - **JWT Authentication Filter:** Validates `Authorization: Bearer <token>` and propagates `X-User-Name` & `X-User-Role` downstream.
+  - **Auto-Inject API Key Filter:** Seamlessly attaches service-specific `X-API-KEY` headers before invoking downstream services.
+  - **Rate Limiting:** Protects endpoints against abuse (60 requests/min per IP).
 
 ---
 
-###  Example API Gateway Testing Flow (cURL)
+### 2. 🔐 Auth Service (`Port 8084`)
+Provides centralized user authentication and JWT token issuance.
+- **Database:** H2 In-Memory (`jdbc:h2:mem:authdb`)
+- **Security:** Spring Security + BCrypt Password Encoder + JJWT
 
-**Step A: Register a New User**
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Register a new user | Public |
+| `POST` | `/api/auth/login` | Authenticate user & receive JWT token | Public |
+| `GET` | `/api/auth/validate` | Validate JWT token (`?token=...`) | Public |
+
+---
+
+### 3. 📦 Product Service (`Port 8081`)
+Manages catalog inventory and details.
+- **Header Security:** `X-API-KEY: PRODUCT-SERVICE-SECRET-KEY`
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/products` | Retrieve all products | `X-API-KEY` |
+| `GET` | `/products/{id}` | Get product details by ID | `X-API-KEY` |
+| `POST` | `/products` | Create a new product entry | `X-API-KEY` |
+| `DELETE` | `/products/{id}` | Delete product by ID | `X-API-KEY` |
+
+---
+
+### 4. 🛒 Order Service (`Port 8082`)
+Manages shopping cart, order placement, and order state progression.
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/v1/orders` | Place a new order | JWT Bearer |
+| `GET` | `/api/v1/orders/{id}` | Fetch order details by ID | JWT Bearer |
+| `GET` | `/api/v1/orders` | List orders (supports filters) | JWT Bearer |
+| `PATCH` | `/api/v1/orders/{id}/status` | Update order status | JWT Bearer |
+| `POST` | `/api/v1/orders/{id}/payment-webhook` | Payment callback trigger | Internal |
+
+---
+
+### 5. 💳 Payment Service (`Port 8083`)
+Processes payment transactions, maintains audit history, and handles refunds.
+- **Header Security:** `X-API-KEY: payment-secret-key-123`
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/payments/process` | Process new payment | `X-API-KEY` |
+| `GET` | `/api/payments/history/{userId}` | Retrieve user transaction history | `X-API-KEY` |
+| `GET` | `/api/payments/{id}` | Fetch transaction by ID | `X-API-KEY` |
+| `POST` | `/api/payments/refund/{id}` | Process a payment refund | `X-API-KEY` |
+
+---
+
+### 6. 🔔 Notification Service (`Port 8085`)
+Dispatches automated Email and SMS notifications for orders and payments.
+- **Header Security:** `X-API-KEY: notification-secret-key-123`
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `POST` | `/api/notifications/email` | Dispatch Email alert | `X-API-KEY` |
+| `POST` | `/api/notifications/sms` | Dispatch SMS alert | `X-API-KEY` |
+| `GET` | `/api/notifications/user/{userId}` | Fetch user notification logs | `X-API-KEY` |
+
+---
+
+## 🧪 End-to-End API Testing Guide
+
+### Step A: Register a New User
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
@@ -126,7 +148,7 @@ curl -X POST http://localhost:8080/api/auth/register \
       }'
 ```
 
-**Step B: Login & Get JWT Token**
+### Step B: Login & Retrieve JWT Token
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
@@ -135,120 +157,57 @@ curl -X POST http://localhost:8080/api/auth/login \
         "password": "Password123!"
       }'
 ```
-*Response returns a JSON containing `"token": "eyJhbGciOiJIUzI1NiJ9..."`.*
+*Extract the `"token"` value from the JSON response.*
 
-**Step C: Call Protected Microservice Endpoint Through Gateway**
+### Step C: Execute Request via API Gateway
 ```bash
 curl -X GET http://localhost:8080/api/payments/history/5 \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
 ```
-*Gateway validates JWT and automatically injects `X-API-KEY: payment-secret-key-123` to Payment Service.*
+*The API Gateway validates your JWT and automatically attaches `X-API-KEY: payment-secret-key-123` upstream.*
 
 ---
 
+## 🐳 Quick Start & Deployment Guide
 
-##  Payment Service (Student 4 Details)
+### Option 1: Run Entire Ecosystem with Docker Compose (Recommended)
 
-The **Payment Service** processes customer payment transactions, stores transaction history, manages payment statuses (`COMPLETED`, `FAILED`, `REFUNDED`), and handles refund processing.
+Ensure Docker Desktop is running, then execute from the project root:
 
-###  Microservice Details
-- **Port:** `8083`
-- **Interactive Swagger UI:** [http://localhost:8083/swagger-ui/index.html](http://localhost:8083/swagger-ui/index.html)
-- **Database:** H2 In-Memory Database (`jdbc:h2:mem:paymentdb`)
-
-###  API Key Security Verification
-Every direct request to the Payment Service endpoints must include the `X-API-KEY` header:
-- **Header Key:** `X-API-KEY`
-- **Header Value:** `payment-secret-key-123`
-
-*Requests missing or providing an invalid API Key will receive a `401 Unauthorized` HTTP response.*
-
-###  REST API Endpoints
-
-| HTTP Method | Endpoint | Description | Header Required |
-|---|---|---|---|
-| `POST` | `/api/payments/process` | Process a new payment transaction | `X-API-KEY: payment-secret-key-123` |
-| `GET` | `/api/payments/history/{userId}` | Retrieve payment history for a user | `X-API-KEY: payment-secret-key-123` |
-| `GET` | `/api/payments/{id}` | Get payment details by payment ID | `X-API-KEY: payment-secret-key-123` |
-| `GET` | `/api/payments/transaction/{transactionId}` | Get payment details by transaction ID | `X-API-KEY: payment-secret-key-123` |
-| `POST` | `/api/payments/refund/{id}` | Process refund for an existing payment | `X-API-KEY: payment-secret-key-123` |
-
-###  Example API Requests (cURL)
-
-**1. Process Payment:**
 ```bash
-curl -X POST http://localhost:8083/api/payments/process \
-  -H "Content-Type: application/json" \
-  -H "X-API-KEY: payment-secret-key-123" \
-  -d '{
-        "orderId": 101,
-        "userId": 5,
-        "amount": 2500.00,
-        "paymentMethod": "CREDIT_CARD",
-        "currency": "LKR"
-      }'
+# Build and launch all microservices in background
+docker compose up --build -d
+
+# View real-time aggregated logs
+docker compose logs -f
+
+# Shut down all microservices
+docker compose down
 ```
 
-**2. Get Payment History for User:**
-```bash
-curl -X GET http://localhost:8083/api/payments/history/5 \
-  -H "X-API-KEY: payment-secret-key-123"
-```
-
-**3. Refund Payment:**
-```bash
-curl -X POST http://localhost:8083/api/payments/refund/1 \
-  -H "Content-Type: application/json" \
-  -H "X-API-KEY: payment-secret-key-123" \
-  -d '{ "reason": "Customer cancelled order" }'
-```
-
-###  How to Run Payment Service Locally
+### Option 2: Run Microservices Individually with Maven
 
 ```bash
-cd payment-service
-.\mvnw spring-boot:run
+# Run Auth Service
+cd auth-service && ./mvnw spring-boot:run
+
+# Run Product Service
+cd product-service && ./mvnw spring-boot:run
+
+# Run Order Service
+cd order-service && ./mvnw spring-boot:run
+
+# Run Payment Service
+cd payment-service && ./mvnw spring-boot:run
+
+# Run Notification Service
+cd notification-service && ./mvnw spring-boot:run
+
+# Run API Gateway
+cd api-gateway && ./mvnw spring-boot:run
 ```
 
 ---
 
-
-##  Notification Service (Student 5 Details)
-
-The **Notification Service** handles sending order status updates and receipts via Email and SMS.
-
-###  Microservice Details
-- **Port:** `8085`
-- **Interactive Swagger UI:** [http://localhost:8085/swagger-ui/index.html](http://localhost:8085/swagger-ui/index.html)
-- **Database:** H2 In-Memory Database (`jdbc:h2:mem:notificationdb`)
-
-###  API Key Security Verification
-Every direct request to the Notification Service endpoints must include the `X-API-KEY` header:
-- **Header Key:** `X-API-KEY`
-- **Header Value:** `notification-secret-key-123`
-
-*Requests missing or providing an invalid API Key will receive a `401 Unauthorized` HTTP response.*
-
-###  REST API Endpoints
-| HTTP Method | Endpoint | Description | Header Required |
-|---|---|---|---|
-| `POST` | `/api/notifications/email` | Send email notification | `X-API-KEY: notification-secret-key-123` |
-| `POST` | `/api/notifications/sms` | Send SMS notification | `X-API-KEY: notification-secret-key-123` |
-| `GET` | `/api/notifications/user/{userId}` | Get notification history for user | `X-API-KEY: notification-secret-key-123` |
-| `GET` | `/api/notifications/{id}` | Get notification details by ID | `X-API-KEY: notification-secret-key-123` |
-
-###  How to Run Notification Service Locally
-```bash
-cd notification-service
-.\mvnw spring-boot:run
-```
-
----
-
-##  Docker Deployment (Entire Ecosystem)
-
-To build and run all microservices with Docker Compose:
-
-```bash
-docker compose up --build
-```
+## 📄 License & Attribution
+Developed as part of the **SOC (Service-Oriented Computing)** course project.
