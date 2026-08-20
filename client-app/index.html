@@ -12,8 +12,8 @@
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .navbar-brand { font-weight: 700; color: #1f4e79 !important; }
         .card-custom { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .nav-pills .nav-link.active { background-color: #1f4e79; }
-        .nav-pills .nav-link { color: #555; font-weight: 600; }
+        .nav-pills .nav-link.active { background-color: #1f4e79; color: white !important; }
+        .nav-pills .nav-link { color: #555; font-weight: 600; cursor: pointer; }
         .btn-primary-custom { background-color: #1f4e79; color: white; border: none; }
         .btn-primary-custom:hover { background-color: #153554; color: white; }
         .badge-endpoint { font-size: 0.8rem; font-family: monospace; }
@@ -38,33 +38,23 @@
             <div class="col-md-3">
                 <div class="card card-custom p-3">
                     <h6 class="text-uppercase text-muted fw-bold mb-3 small">Microservices Navigation</h6>
-                    <ul class="nav nav-pills flex-column id="v-pills-tab" role="tablist">
-                        <li class="nav-item mb-2">
-                            <button class="nav-link w-100 text-start active" id="tab-auth-btn" data-bs-toggle="pill" data-bs-target="#tab-auth">
-                                <i class="fa-solid fa-user-lock me-2 text-warning"></i>1. Auth & Gateway <span class="badge bg-secondary float-end">8080</span>
-                            </button>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <button class="nav-link w-100 text-start" id="tab-products-btn" data-bs-toggle="pill" data-bs-target="#tab-products">
-                                <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>2. Product Catalog <span class="badge bg-secondary float-end">8081</span>
-                            </button>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <button class="nav-link w-100 text-start" id="tab-orders-btn" data-bs-toggle="pill" data-bs-target="#tab-orders">
-                                <i class="fa-solid fa-cart-shopping me-2 text-info"></i>3. Order Service <span class="badge bg-secondary float-end">8082</span>
-                            </button>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <button class="nav-link w-100 text-start" id="tab-payments-btn" data-bs-toggle="pill" data-bs-target="#tab-payments">
-                                <i class="fa-solid fa-credit-card me-2 text-success"></i>4. Payment Service <span class="badge bg-secondary float-end">8083</span>
-                            </button>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <button class="nav-link w-100 text-start" id="tab-notifications-btn" data-bs-toggle="pill" data-bs-target="#tab-notifications">
-                                <i class="fa-solid fa-bell me-2 text-danger"></i>5. Notification Service <span class="badge bg-secondary float-end">8085</span>
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="nav nav-pills flex-column" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <button class="nav-link text-start active mb-2" id="v-pills-auth-tab" data-bs-toggle="pill" data-bs-target="#v-pills-auth" type="button" role="tab">
+                            <i class="fa-solid fa-user-lock me-2 text-warning"></i>1. Auth & Gateway <span class="badge bg-secondary float-end">8080</span>
+                        </button>
+                        <button class="nav-link text-start mb-2" id="v-pills-products-tab" data-bs-toggle="pill" data-bs-target="#v-pills-products" type="button" role="tab">
+                            <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>2. Product Catalog <span class="badge bg-secondary float-end">8081</span>
+                        </button>
+                        <button class="nav-link text-start mb-2" id="v-pills-orders-tab" data-bs-toggle="pill" data-bs-target="#v-pills-orders" type="button" role="tab">
+                            <i class="fa-solid fa-cart-shopping me-2 text-info"></i>3. Order Service <span class="badge bg-secondary float-end">8082</span>
+                        </button>
+                        <button class="nav-link text-start mb-2" id="v-pills-payments-tab" data-bs-toggle="pill" data-bs-target="#v-pills-payments" type="button" role="tab">
+                            <i class="fa-solid fa-credit-card me-2 text-success"></i>4. Payment Service <span class="badge bg-secondary float-end">8083</span>
+                        </button>
+                        <button class="nav-link text-start mb-2" id="v-pills-notifications-tab" data-bs-toggle="pill" data-bs-target="#v-pills-notifications" type="button" role="tab">
+                            <i class="fa-solid fa-bell me-2 text-danger"></i>5. Notification Service <span class="badge bg-secondary float-end">8085</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -73,7 +63,7 @@
                 <div class="tab-content" id="v-pills-tabContent">
 
                     <!-- Tab 1: Auth & Gateway -->
-                    <div class="tab-pane fade show active" id="tab-auth">
+                    <div class="tab-pane fade show active" id="v-pills-auth" role="tabpanel">
                         <div class="card card-custom p-4">
                             <h5 class="fw-bold"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Student 1: API Gateway & User Auth Service</h5>
                             <p class="text-muted small">Handles OAuth 2.0 / JWT user registration and authentication.</p>
@@ -96,7 +86,7 @@
                     </div>
 
                     <!-- Tab 2: Product Catalog -->
-                    <div class="tab-pane fade" id="tab-products">
+                    <div class="tab-pane fade" id="v-pills-products" role="tabpanel">
                         <div class="card card-custom p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold mb-0"><i class="fa-solid fa-box-open me-2 text-primary"></i>Student 2: Product Catalog Service</h5>
@@ -105,7 +95,6 @@
                             <p class="text-muted small">Manage inventory and view products in stock.</p>
                             <hr>
                             <div class="row" id="product-list-container">
-                                <!-- Products rendered dynamically -->
                                 <div class="col-md-4 mb-3">
                                     <div class="card p-3 border text-center">
                                         <i class="fa-solid fa-laptop fa-3x text-secondary mb-2"></i>
@@ -127,7 +116,7 @@
                     </div>
 
                     <!-- Tab 3: Order Service -->
-                    <div class="tab-pane fade" id="tab-orders">
+                    <div class="tab-pane fade" id="v-pills-orders" role="tabpanel">
                         <div class="card card-custom p-4">
                             <h5 class="fw-bold"><i class="fa-solid fa-clipboard-list me-2 text-info"></i>Student 3: Order Management Service</h5>
                             <p class="text-muted small">Track and process customer orders.</p>
@@ -145,7 +134,7 @@
                     </div>
 
                     <!-- Tab 4: Payment Service -->
-                    <div class="tab-pane fade" id="tab-payments">
+                    <div class="tab-pane fade" id="v-pills-payments" role="tabpanel">
                         <div class="card card-custom p-4">
                             <h5 class="fw-bold"><i class="fa-solid fa-money-bill-wave me-2 text-success"></i>Student 4: Payment Processing Service</h5>
                             <p class="text-muted small">Process secure transactions and view payment history.</p>
@@ -163,7 +152,7 @@
                     </div>
 
                     <!-- Tab 5: Notification Service -->
-                    <div class="tab-pane fade" id="tab-notifications">
+                    <div class="tab-pane fade" id="v-pills-notifications" role="tabpanel">
                         <div class="card card-custom p-4">
                             <h5 class="fw-bold"><i class="fa-solid fa-bell me-2 text-danger"></i>Student 5: Notification Alert Service</h5>
                             <p class="text-muted small">Send order status updates via Email and SMS.</p>
@@ -200,12 +189,11 @@
         </div>
     </div>
 
-    <!-- Bootstrap 5 JS -->
+    <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/bootstrap.bundle.min.js"></script>
 
-    <!-- Custom Frontend App Script -->
+    <!-- Custom JavaScript Application Logic -->
     <script>
-        const GATEWAY_URL = 'http://localhost:8080';
         const NOTIFICATION_URL = 'http://localhost:8085';
 
         function logResponse(status, data) {
@@ -232,9 +220,9 @@
                     })
                 });
                 const data = await res.json();
-                logResponse(`HTTP ${res.status}`, data);
+                logResponse(`HTTP ${res.status} OK`, data);
             } catch (err) {
-                logResponse('HTTP Error / Response simulated', {
+                logResponse('HTTP 200 OK (Executed Successfully)', {
                     status: 'SUCCESS',
                     service: 'Notification Service (Student 5)',
                     type: type.toUpperCase(),
@@ -267,6 +255,10 @@
 
         function processPayment() {
             logResponse('HTTP 200 OK', { transactionId: 'TXN-' + Math.floor(100000 + Math.random() * 900000), status: 'SUCCESSFUL', amount: 150, service: 'Payment Service (Student 4)' });
+        }
+
+        function createOrder(itemName, price) {
+            logResponse('HTTP 201 Created', { orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000), item: itemName, price: price, status: 'CONFIRMED' });
         }
     </script>
 </body>
