@@ -28,12 +28,12 @@ spring:
         - id: product-service
           uri: ${PRODUCT_SERVICE_URL:http://localhost:8081}
           predicates:
-            - Path=/api/products/**
+            - Path=/api/products/**, /products/**
 
         - id: order-service
           uri: ${ORDER_SERVICE_URL:http://localhost:8082}
           predicates:
-            - Path=/api/orders/**
+            - Path=/api/orders/**, /api/v1/orders/**
 
         - id: payment-service
           uri: ${PAYMENT_SERVICE_URL:http://localhost:8083}

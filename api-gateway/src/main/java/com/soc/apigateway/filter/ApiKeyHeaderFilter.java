@@ -33,13 +33,13 @@ public class ApiKeyHeaderFilter implements GlobalFilter, Ordered {
 
         ServerHttpRequest.Builder builder = request.mutate();
 
-        if (path.startsWith("/api/products")) {
+        if (path.startsWith("/api/products") || path.startsWith("/products")) {
             builder.header(API_KEY_HEADER, productApiKey);
         } else if (path.startsWith("/api/payments")) {
             builder.header(API_KEY_HEADER, paymentApiKey);
         } else if (path.startsWith("/api/notifications")) {
             builder.header(API_KEY_HEADER, notificationApiKey);
-        } else if (path.startsWith("/api/orders")) {
+        } else if (path.startsWith("/api/orders") || path.startsWith("/api/v1/orders")) {
             builder.header(API_KEY_HEADER, orderApiKey);
         }
 

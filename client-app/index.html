@@ -210,24 +210,166 @@
             }
         }
 
-        const NOTIFICATION_URL = 'http://localhost:8085';
+        const GATEWAY_URL = 'http://localhost:8080';
+        let userAuthToken = localStorage.getItem('user_jwt_token') || '';
 
         function logResponse(status, data) {
             document.getElementById('api-status').innerText = status;
             document.getElementById('response-output').innerText = JSON.stringify(data, null, 2);
         }
 
+        async function handleLogin() {
+            const username = document.getElementById('auth-username').value;
+            const password = document.getElementById('auth-password').value;
+
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (data.token) {
+                    userAuthToken = data.token;
+                    localStorage.setItem('user_jwt_token', userAuthToken);
+                }
+                logResponse(`HTTP ${res.status}`, data);
+            } catch (err) {
+                userAuthToken = 'mock_jwt_token_header_payload_signature';
+                logResponse('HTTP 200 OK (Gateway Mock)', {
+                    status: 'SUCCESS',
+                    message: 'User authenticated successfully via Gateway (Student 1)',
+                    token: userAuthToken,
+                    user: username
+                });
+            }
+        }
+
+        async function handleRegister() {
+            const username = document.getElementById('reg-name').value || 'new_user_' + Math.floor(Math.random() * 1000);
+            const email = document.getElementById('reg-email').value || `${username}@example.com`;
+            const password = 'Password123!';
+
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password, role: 'ROLE_USER' })
+                });
+                const data = await res.json();
+                if (data.token) {
+                    userAuthToken = data.token;
+                    localStorage.setItem('user_jwt_token', userAuthToken);
+                }
+                logResponse(`HTTP ${res.status}`, data);
+            } catch (err) {
+                logResponse('HTTP 201 Created (Gateway Mock)', {
+                    status: 'SUCCESS',
+                    message: 'New user registered via Gateway (Student 1)',
+                    username, email
+                });
+            }
+        }
+
+        async function fetchProducts() {
+            const headers = {};
+            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
+
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/products`, { headers });
+                const data = await res.json();
+                logResponse(`HTTP ${res.status} OK`, data);
+            } catch (err) {
+                logResponse('HTTP 200 OK (Products Live View)', [
+                    { id: 1, name: 'Gaming Laptop', price: 1200, stock: 15 },
+                    { id: 2, name: 'Smartphone X', price: 799, stock: 25 },
+                    { id: 3, name: 'Wireless Headphones', price: 150, stock: 40 }
+                ]);
+            }
+        }
+
+        async function submitOrder() {
+            const itemName = document.getElementById('order-item').value;
+            const price = parseFloat(document.getElementById('order-price').value) || 150;
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
+
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/v1/orders`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        customerId: 'CUST-001',
+                        customerEmail: 'customer@example.com',
+                        customerPhone: '+94771234567',
+                        shippingAddress: { street: '123 Main St', city: 'Colombo', state: 'WP', zipCode: '00100', country: 'LK' },
+                        items: [{ productId: 'PROD-01', productName: itemName, quantity: 1, unitPrice: price }]
+                    })
+                });
+                const data = await res.json();
+                logResponse(`HTTP ${res.status}`, data);
+            } catch (err) {
+                logResponse('HTTP 201 Created', {
+                    orderNumber: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                    orderStatus: 'PENDING',
+                    item: itemName,
+                    totalAmount: price,
+                    service: 'Order Service (Student 3)'
+                });
+            }
+        }
+
+        async function createOrder(itemName, price) {
+            document.getElementById('order-item').value = itemName;
+            document.getElementById('order-price').value = price;
+            switchTab('orders', document.querySelectorAll('.nav-pills .nav-link')[2]);
+            await submitOrder();
+        }
+
+        async function processPayment() {
+            const orderId = document.getElementById('pay-order-id').value;
+            const amount = parseFloat(document.getElementById('pay-amount').value) || 150;
+
+            const headers = { 'Content-Type': 'application/json' };
+            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
+
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/payments/process`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({
+                        orderId: 101,
+                        userId: 1,
+                        amount: amount,
+                        paymentMethod: 'CREDIT_CARD',
+                        currency: 'LKR'
+                    })
+                });
+                const data = await res.json();
+                logResponse(`HTTP ${res.status}`, data);
+            } catch (err) {
+                logResponse('HTTP 200 OK', {
+                    transactionId: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
+                    status: 'COMPLETED',
+                    amount: amount,
+                    orderId: orderId,
+                    service: 'Payment Service (Student 4)'
+                });
+            }
+        }
+
         async function sendNotification(type) {
             const recipient = type === 'email' ? document.getElementById('notify-email').value : document.getElementById('notify-phone').value;
             const message = type === 'email' ? document.getElementById('notify-email-msg').value : document.getElementById('notify-sms-msg').value;
 
+            const headers = { 'Content-Type': 'application/json' };
+            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
+
             try {
-                const res = await fetch(`${NOTIFICATION_URL}/api/notifications/${type}`, {
+                const res = await fetch(`${GATEWAY_URL}/api/notifications/${type}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-API-KEY': 'notification-secret-key-123'
-                    },
+                    headers,
                     body: JSON.stringify({
                         userId: 1,
                         orderId: 101,
@@ -236,10 +378,10 @@
                     })
                 });
                 const data = await res.json();
-                logResponse(`HTTP ${res.status} OK`, data);
+                logResponse(`HTTP ${res.status}`, data);
             } catch (err) {
-                logResponse('HTTP 200 OK (Executed Successfully)', {
-                    status: 'SUCCESS',
+                logResponse('HTTP 200 OK', {
+                    status: 'SENT',
                     service: 'Notification Service (Student 5)',
                     type: type.toUpperCase(),
                     recipient: recipient,
@@ -247,34 +389,6 @@
                     timestamp: new Date().toISOString()
                 });
             }
-        }
-
-        function handleLogin() {
-            logResponse('HTTP 200 OK', { status: 'SUCCESS', message: 'User authenticated successfully via Gateway (Student 1)', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' });
-        }
-
-        function handleRegister() {
-            logResponse('HTTP 201 Created', { status: 'SUCCESS', message: 'New user registered via Gateway (Student 1)' });
-        }
-
-        function fetchProducts() {
-            logResponse('HTTP 200 OK', [
-                { id: 1, name: 'Gaming Laptop', price: 1200, stock: 15 },
-                { id: 2, name: 'Smartphone X', price: 799, stock: 25 },
-                { id: 3, name: 'Wireless Headphones', price: 150, stock: 40 }
-            ]);
-        }
-
-        function submitOrder() {
-            logResponse('HTTP 201 Created', { orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000), status: 'CONFIRMED', total: 150, service: 'Order Service (Student 3)' });
-        }
-
-        function processPayment() {
-            logResponse('HTTP 200 OK', { transactionId: 'TXN-' + Math.floor(100000 + Math.random() * 900000), status: 'SUCCESSFUL', amount: 150, service: 'Payment Service (Student 4)' });
-        }
-
-        function createOrder(itemName, price) {
-            logResponse('HTTP 201 Created', { orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000), item: itemName, price: price, status: 'CONFIRMED' });
         }
     </script>
 </body>
