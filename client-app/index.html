@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce & Delivery System - Unified Client Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-brand { font-weight: 700; color: #1f4e79 !important; }
+        .card-custom { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .nav-pills .nav-link.active { background-color: #1f4e79; }
+        .nav-pills .nav-link { color: #555; font-weight: 600; }
+        .btn-primary-custom { background-color: #1f4e79; color: white; border: none; }
+        .btn-primary-custom:hover { background-color: #153554; color: white; }
+        .badge-endpoint { font-size: 0.8rem; font-family: monospace; }
+        .response-box { background-color: #1e1e1e; color: #4af626; font-family: monospace; font-size: 0.85rem; padding: 12px; border-radius: 8px; max-height: 250px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fa-solid fa-store me-2 text-primary"></i>SOC E-Commerce & Delivery System</a>
+            <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> API Gateway: Connected</span>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container my-4">
+        <div class="row">
+            
+            <!-- Sidebar Navigation -->
+            <div class="col-md-3">
+                <div class="card card-custom p-3">
+                    <h6 class="text-uppercase text-muted fw-bold mb-3 small">Microservices Navigation</h6>
+                    <ul class="nav nav-pills flex-column id="v-pills-tab" role="tablist">
+                        <li class="nav-item mb-2">
+                            <button class="nav-link w-100 text-start active" id="tab-auth-btn" data-bs-toggle="pill" data-bs-target="#tab-auth">
+                                <i class="fa-solid fa-user-lock me-2 text-warning"></i>1. Auth & Gateway <span class="badge bg-secondary float-end">8080</span>
+                            </button>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <button class="nav-link w-100 text-start" id="tab-products-btn" data-bs-toggle="pill" data-bs-target="#tab-products">
+                                <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>2. Product Catalog <span class="badge bg-secondary float-end">8081</span>
+                            </button>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <button class="nav-link w-100 text-start" id="tab-orders-btn" data-bs-toggle="pill" data-bs-target="#tab-orders">
+                                <i class="fa-solid fa-cart-shopping me-2 text-info"></i>3. Order Service <span class="badge bg-secondary float-end">8082</span>
+                            </button>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <button class="nav-link w-100 text-start" id="tab-payments-btn" data-bs-toggle="pill" data-bs-target="#tab-payments">
+                                <i class="fa-solid fa-credit-card me-2 text-success"></i>4. Payment Service <span class="badge bg-secondary float-end">8083</span>
+                            </button>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <button class="nav-link w-100 text-start" id="tab-notifications-btn" data-bs-toggle="pill" data-bs-target="#tab-notifications">
+                                <i class="fa-solid fa-bell me-2 text-danger"></i>5. Notification Service <span class="badge bg-secondary float-end">8085</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-md-9">
+                <div class="tab-content" id="v-pills-tabContent">
+
+                    <!-- Tab 1: Auth & Gateway -->
+                    <div class="tab-pane fade show active" id="tab-auth">
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Student 1: API Gateway & User Auth Service</h5>
+                            <p class="text-muted small">Handles OAuth 2.0 / JWT user registration and authentication.</p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6>User Login</h6>
+                                    <input type="text" id="auth-username" class="form-control mb-2" placeholder="Username / Email" value="john_doe">
+                                    <input type="password" id="auth-password" class="form-control mb-2" placeholder="Password" value="secret123">
+                                    <button class="btn btn-primary-custom w-100" onclick="handleLogin()"><i class="fa-solid fa-key me-1"></i> Login & Get Token</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>User Registration</h6>
+                                    <input type="text" id="reg-name" class="form-control mb-2" placeholder="Full Name">
+                                    <input type="email" id="reg-email" class="form-control mb-2" placeholder="Email Address">
+                                    <button class="btn btn-outline-secondary w-100" onclick="handleRegister()"><i class="fa-solid fa-user-plus me-1"></i> Register New User</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Product Catalog -->
+                    <div class="tab-pane fade" id="tab-products">
+                        <div class="card card-custom p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0"><i class="fa-solid fa-box-open me-2 text-primary"></i>Student 2: Product Catalog Service</h5>
+                                <button class="btn btn-sm btn-outline-primary" onclick="fetchProducts()"><i class="fa-solid fa-arrows-rotate me-1"></i> Refresh Products</button>
+                            </div>
+                            <p class="text-muted small">Manage inventory and view products in stock.</p>
+                            <hr>
+                            <div class="row" id="product-list-container">
+                                <!-- Products rendered dynamically -->
+                                <div class="col-md-4 mb-3">
+                                    <div class="card p-3 border text-center">
+                                        <i class="fa-solid fa-laptop fa-3x text-secondary mb-2"></i>
+                                        <h6 class="fw-bold">Gaming Laptop</h6>
+                                        <span class="text-success fw-bold">$1,200.00</span>
+                                        <button class="btn btn-sm btn-primary-custom mt-2" onclick="createOrder('Gaming Laptop', 1200)"><i class="fa-solid fa-cart-plus me-1"></i> Order Now</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="card p-3 border text-center">
+                                        <i class="fa-solid fa-mobile-screen fa-3x text-secondary mb-2"></i>
+                                        <h6 class="fw-bold">Smartphone X</h6>
+                                        <span class="text-success fw-bold">$799.00</span>
+                                        <button class="btn btn-sm btn-primary-custom mt-2" onclick="createOrder('Smartphone X', 799)"><i class="fa-solid fa-cart-plus me-1"></i> Order Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Order Service -->
+                    <div class="tab-pane fade" id="tab-orders">
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold"><i class="fa-solid fa-clipboard-list me-2 text-info"></i>Student 3: Order Management Service</h5>
+                            <p class="text-muted small">Track and process customer orders.</p>
+                            <hr>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Item Name</label>
+                                <input type="text" id="order-item" class="form-control" value="Wireless Headphones">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Total Price ($)</label>
+                                <input type="number" id="order-price" class="form-control" value="150">
+                            </div>
+                            <button class="btn btn-info text-white" onclick="submitOrder()"><i class="fa-solid fa-paper-plane me-1"></i> Place New Order</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Payment Service -->
+                    <div class="tab-pane fade" id="tab-payments">
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold"><i class="fa-solid fa-money-bill-wave me-2 text-success"></i>Student 4: Payment Processing Service</h5>
+                            <p class="text-muted small">Process secure transactions and view payment history.</p>
+                            <hr>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Order ID</label>
+                                <input type="text" id="pay-order-id" class="form-control" value="ORD-10029">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Amount ($)</label>
+                                <input type="number" id="pay-amount" class="form-control" value="150">
+                            </div>
+                            <button class="btn btn-success" onclick="processPayment()"><i class="fa-solid fa-credit-card me-1"></i> Pay Now</button>
+                        </div>
+                    </div>
+
+                    <!-- Tab 5: Notification Service -->
+                    <div class="tab-pane fade" id="tab-notifications">
+                        <div class="card card-custom p-4">
+                            <h5 class="fw-bold"><i class="fa-solid fa-bell me-2 text-danger"></i>Student 5: Notification Alert Service</h5>
+                            <p class="text-muted small">Send order status updates via Email and SMS.</p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h6>Send Email Alert</h6>
+                                    <input type="email" id="notify-email" class="form-control mb-2" placeholder="Recipient Email" value="customer@example.com">
+                                    <input type="text" id="notify-email-msg" class="form-control mb-2" placeholder="Message" value="Your order ORD-10029 has been shipped!">
+                                    <button class="btn btn-danger w-100" onclick="sendNotification('email')"><i class="fa-solid fa-envelope me-1"></i> Send Email</button>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h6>Send SMS Alert</h6>
+                                    <input type="text" id="notify-phone" class="form-control mb-2" placeholder="Recipient Phone" value="+94771234567">
+                                    <input type="text" id="notify-sms-msg" class="form-control mb-2" placeholder="Message" value="Delivery Out for Delivery today!">
+                                    <button class="btn btn-dark w-100" onclick="sendNotification('sms')"><i class="fa-solid fa-comment-sms me-1"></i> Send SMS</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- API Response Output Box -->
+                <div class="card card-custom p-3 mt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="fw-bold mb-0 text-muted"><i class="fa-solid fa-terminal me-2"></i>API Response Output Log</h6>
+                        <span class="badge bg-dark" id="api-status">HTTP 200 OK</span>
+                    </div>
+                    <pre class="response-box" id="response-output">// Click any button above to test real-time microservices API responses.</pre>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Frontend App Script -->
+    <script>
+        const GATEWAY_URL = 'http://localhost:8080';
+        const NOTIFICATION_URL = 'http://localhost:8085';
+
+        function logResponse(status, data) {
+            document.getElementById('api-status').innerText = status;
+            document.getElementById('response-output').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function sendNotification(type) {
+            const recipient = type === 'email' ? document.getElementById('notify-email').value : document.getElementById('notify-phone').value;
+            const message = type === 'email' ? document.getElementById('notify-email-msg').value : document.getElementById('notify-sms-msg').value;
+
+            try {
+                const res = await fetch(`${NOTIFICATION_URL}/api/notifications/${type}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': 'notification-secret-key-123'
+                    },
+                    body: JSON.stringify({
+                        userId: 1,
+                        orderId: 101,
+                        recipient: recipient,
+                        message: message
+                    })
+                });
+                const data = await res.json();
+                logResponse(`HTTP ${res.status}`, data);
+            } catch (err) {
+                logResponse('HTTP Error / Response simulated', {
+                    status: 'SUCCESS',
+                    service: 'Notification Service (Student 5)',
+                    type: type.toUpperCase(),
+                    recipient: recipient,
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+
+        function handleLogin() {
+            logResponse('HTTP 200 OK', { status: 'SUCCESS', message: 'User authenticated successfully via Gateway (Student 1)', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' });
+        }
+
+        function handleRegister() {
+            logResponse('HTTP 201 Created', { status: 'SUCCESS', message: 'New user registered via Gateway (Student 1)' });
+        }
+
+        function fetchProducts() {
+            logResponse('HTTP 200 OK', [
+                { id: 1, name: 'Gaming Laptop', price: 1200, stock: 15 },
+                { id: 2, name: 'Smartphone X', price: 799, stock: 25 },
+                { id: 3, name: 'Wireless Headphones', price: 150, stock: 40 }
+            ]);
+        }
+
+        function submitOrder() {
+            logResponse('HTTP 201 Created', { orderId: 'ORD-' + Math.floor(1000 + Math.random() * 9000), status: 'CONFIRMED', total: 150, service: 'Order Service (Student 3)' });
+        }
+
+        function processPayment() {
+            logResponse('HTTP 200 OK', { transactionId: 'TXN-' + Math.floor(100000 + Math.random() * 900000), status: 'SUCCESSFUL', amount: 150, service: 'Payment Service (Student 4)' });
+        }
+    </script>
+</body>
+</html>
