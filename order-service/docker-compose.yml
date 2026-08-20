@@ -1,0 +1,38 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: order_service_mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: order_service_mongo_express
+    restart: always
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      - mongodb
+
+  order-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: order_service_app
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/order_db
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
+    driver: local

@@ -1,0 +1,246 @@
+{
+	"info": {
+		"_postman_id": "a87e5b31-2f34-4b4f-8e2b-98f9c71e0123",
+		"name": "E-Commerce Order Service API",
+		"description": "Complete Postman collection for testing the Spring Boot Order Microservice with MongoDB.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "60d5ec49f1b2c8234c895234",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Place New Order",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"if (jsonData.success && jsonData.data && jsonData.data.id) {",
+							"    pm.collectionVariables.set('orderId', jsonData.data.id);",
+							"    console.log('Saved orderId: ' + jsonData.data.id);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"customerId\": \"CUST-1002\",\n  \"customerEmail\": \"sithumini@example.com\",\n  \"customerPhone\": \"+94771234567\",\n  \"shippingAddress\": {\n    \"street\": \"45 Galle Road\",\n    \"city\": \"Colombo\",\n    \"state\": \"Western\",\n    \"zipCode\": \"00300\",\n    \"country\": \"Sri Lanka\"\n  },\n  \"items\": [\n    {\n      \"productId\": \"PROD-101\",\n      \"productName\": \"Sony WH-1000XM5 Headphones\",\n      \"unitPrice\": 350.00,\n      \"quantity\": 1\n    },\n    {\n      \"productId\": \"PROD-202\",\n      \"productName\": \"Anker Power Bank 20000mAh\",\n      \"unitPrice\": 49.99,\n      \"quantity\": 2\n    }\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Get Order by ID or Order Number",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. List All Orders (Paginated & Filtered)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders?page=0&size=10&status=PENDING",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "size",
+							"value": "10"
+						},
+						{
+							"key": "status",
+							"value": "PENDING"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Process Payment Webhook Callback",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transactionId\": \"TXN-987654321\",\n  \"paymentStatus\": \"PAID\",\n  \"amountPaid\": 449.98,\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"gatewayResponseMessage\": \"Transaction approved successfully\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/payment-webhook",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{orderId}}",
+						"payment-webhook"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Update Order Status",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"orderStatus\": \"PROCESSING\",\n  \"note\": \"Order verified and sent to warehouse for packaging\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/status",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{orderId}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Update Delivery Dispatch Info",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"deliveryStatus\": \"IN_TRANSIT\",\n  \"carrier\": \"DHL Express\",\n  \"trackingNumber\": \"DHL-SL-8839201\",\n  \"estimatedDeliveryTime\": \"2026-08-14T17:00:00\",\n  \"dispatchNotes\": \"Package picked up by courier rider\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}/delivery",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{orderId}}",
+						"delivery"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Cancel Order",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/orders/{{orderId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"orders",
+						"{{orderId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Actuator Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/actuator/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"actuator",
+						"health"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

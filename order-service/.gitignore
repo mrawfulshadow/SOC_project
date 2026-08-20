@@ -1,0 +1,17 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!target/classes/architecture.json
+!target/classes/architecture.json.sha1
+
+### Editor & System Files ###
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+*.log
+
+### OS Files ###
+.DS_Store
+Thumbs.db
