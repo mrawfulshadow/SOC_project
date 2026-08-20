@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  client-app:
+    build:
+      context: ./client-app
+      dockerfile: Dockerfile
+    container_name: client-app
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+    restart: always
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -88,6 +99,9 @@ services:
       - "8085:8085"
     environment:
       - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATA_MONGODB_URI=mongodb://order-mongodb:27017/notificationdb
+    depends_on:
+      - order-mongodb
     restart: always
 
 volumes:
