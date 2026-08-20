@@ -75,7 +75,7 @@ services:
     container_name: order-mongodb
     restart: always
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - order_mongodb_data:/data/db
 
