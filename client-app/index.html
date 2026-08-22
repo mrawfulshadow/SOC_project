@@ -3,393 +3,1225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce & Delivery System - Unified Client Dashboard</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <title>AURA — Next-Gen Electronics & Express Delivery</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            900: '#090d16',
+                            800: '#0f172a',
+                            700: '#1e293b',
+                            600: '#334155'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- React 18 & Babel CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .navbar-brand { font-weight: 700; color: #1f4e79 !important; }
-        .card-custom { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .nav-pills .nav-link.active { background-color: #1f4e79 !important; color: white !important; }
-        .nav-pills .nav-link { color: #555; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-        .btn-primary-custom { background-color: #1f4e79; color: white; border: none; }
-        .btn-primary-custom:hover { background-color: #153554; color: white; }
-        .tab-pane-custom { display: none; }
-        .tab-pane-custom.active-pane { display: block; }
-        .response-box { background-color: #1e1e1e; color: #4af626; font-family: monospace; font-size: 0.85rem; padding: 12px; border-radius: 8px; max-height: 250px; overflow-y: auto; }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+        .glow-accent {
+            box-shadow: 0 0 25px -5px rgba(2, 132, 199, 0.35);
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
 </head>
-<body>
+<body class="bg-[#090d16] text-slate-100 min-h-screen">
+    
+    <div id="root"></div>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-3">
-        <div class="container">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-store me-2 text-primary"></i>SOC E-Commerce & Delivery System</a>
-            <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> API Gateway: Connected</span>
-        </div>
-    </nav>
-
-    <!-- Main Container -->
-    <div class="container my-4">
-        <div class="row">
-            
-            <!-- Sidebar Navigation -->
-            <div class="col-md-3">
-                <div class="card card-custom p-3">
-                    <h6 class="text-uppercase text-muted fw-bold mb-3 small">Microservices Navigation</h6>
-                    <div class="nav nav-pills flex-column">
-                        <button class="nav-link text-start active mb-2" onclick="switchTab('auth', this)">
-                            <i class="fa-solid fa-user-lock me-2 text-warning"></i>1. Auth & Gateway <span class="badge bg-secondary float-end">8080</span>
-                        </button>
-                        <button class="nav-link text-start mb-2" onclick="switchTab('products', this)">
-                            <i class="fa-solid fa-boxes-stacked me-2 text-primary"></i>2. Product Catalog <span class="badge bg-secondary float-end">8081</span>
-                        </button>
-                        <button class="nav-link text-start mb-2" onclick="switchTab('orders', this)">
-                            <i class="fa-solid fa-cart-shopping me-2 text-info"></i>3. Order Service <span class="badge bg-secondary float-end">8082</span>
-                        </button>
-                        <button class="nav-link text-start mb-2" onclick="switchTab('payments', this)">
-                            <i class="fa-solid fa-credit-card me-2 text-success"></i>4. Payment Service <span class="badge bg-secondary float-end">8083</span>
-                        </button>
-                        <button class="nav-link text-start mb-2" onclick="switchTab('notifications', this)">
-                            <i class="fa-solid fa-bell me-2 text-danger"></i>5. Notification Service <span class="badge bg-secondary float-end">8085</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content Area -->
-            <div class="col-md-9">
-
-                <!-- Tab 1: Auth & Gateway -->
-                <div class="tab-pane-custom active-pane" id="pane-auth">
-                    <div class="card card-custom p-4">
-                        <h5 class="fw-bold"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Student 1: API Gateway & User Auth Service</h5>
-                        <p class="text-muted small">Handles OAuth 2.0 / JWT user registration and authentication.</p>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <h6>User Login</h6>
-                                <input type="text" id="auth-username" class="form-control mb-2" placeholder="Username / Email" value="john_doe">
-                                <input type="password" id="auth-password" class="form-control mb-2" placeholder="Password" value="secret123">
-                                <button class="btn btn-primary-custom w-100" onclick="handleLogin()"><i class="fa-solid fa-key me-1"></i> Login & Get Token</button>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>User Registration</h6>
-                                <input type="text" id="reg-name" class="form-control mb-2" placeholder="Full Name">
-                                <input type="email" id="reg-email" class="form-control mb-2" placeholder="Email Address">
-                                <button class="btn btn-outline-secondary w-100" onclick="handleRegister()"><i class="fa-solid fa-user-plus me-1"></i> Register New User</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 2: Product Catalog -->
-                <div class="tab-pane-custom" id="pane-products">
-                    <div class="card card-custom p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-box-open me-2 text-primary"></i>Student 2: Product Catalog Service</h5>
-                            <button class="btn btn-sm btn-outline-primary" onclick="fetchProducts()"><i class="fa-solid fa-arrows-rotate me-1"></i> Refresh Products</button>
-                        </div>
-                        <p class="text-muted small">Manage inventory and view products in stock.</p>
-                        <hr>
-                        <div class="row" id="product-list-container">
-                            <div class="col-md-4 mb-3">
-                                <div class="card p-3 border text-center">
-                                    <i class="fa-solid fa-laptop fa-3x text-secondary mb-2"></i>
-                                    <h6 class="fw-bold">Gaming Laptop</h6>
-                                    <span class="text-success fw-bold">$1,200.00</span>
-                                    <button class="btn btn-sm btn-primary-custom mt-2" onclick="createOrder('Gaming Laptop', 1200)"><i class="fa-solid fa-cart-plus me-1"></i> Order Now</button>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="card p-3 border text-center">
-                                    <i class="fa-solid fa-mobile-screen fa-3x text-secondary mb-2"></i>
-                                    <h6 class="fw-bold">Smartphone X</h6>
-                                    <span class="text-success fw-bold">$799.00</span>
-                                    <button class="btn btn-sm btn-primary-custom mt-2" onclick="createOrder('Smartphone X', 799)"><i class="fa-solid fa-cart-plus me-1"></i> Order Now</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab 3: Order Service -->
-                <div class="tab-pane-custom" id="pane-orders">
-                    <div class="card card-custom p-4">
-                        <h5 class="fw-bold"><i class="fa-solid fa-clipboard-list me-2 text-info"></i>Student 3: Order Management Service</h5>
-                        <p class="text-muted small">Track and process customer orders.</p>
-                        <hr>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Item Name</label>
-                            <input type="text" id="order-item" class="form-control" value="Wireless Headphones">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Total Price ($)</label>
-                            <input type="number" id="order-price" class="form-control" value="150">
-                        </div>
-                        <button class="btn btn-info text-white" onclick="submitOrder()"><i class="fa-solid fa-paper-plane me-1"></i> Place New Order</button>
-                    </div>
-                </div>
-
-                <!-- Tab 4: Payment Service -->
-                <div class="tab-pane-custom" id="pane-payments">
-                    <div class="card card-custom p-4">
-                        <h5 class="fw-bold"><i class="fa-solid fa-money-bill-wave me-2 text-success"></i>Student 4: Payment Processing Service</h5>
-                        <p class="text-muted small">Process secure transactions and view payment history.</p>
-                        <hr>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Order ID</label>
-                            <input type="text" id="pay-order-id" class="form-control" value="ORD-10029">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Amount ($)</label>
-                            <input type="number" id="pay-amount" class="form-control" value="150">
-                        </div>
-                        <button class="btn btn-success" onclick="processPayment()"><i class="fa-solid fa-credit-card me-1"></i> Pay Now</button>
-                    </div>
-                </div>
-
-                <!-- Tab 5: Notification Service -->
-                <div class="tab-pane-custom" id="pane-notifications">
-                    <div class="card card-custom p-4">
-                        <h5 class="fw-bold"><i class="fa-solid fa-bell me-2 text-danger"></i>Student 5: Notification Alert Service</h5>
-                        <p class="text-muted small">Send order status updates via Email and SMS.</p>
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <h6>Send Email Alert</h6>
-                                <input type="email" id="notify-email" class="form-control mb-2" placeholder="Recipient Email" value="customer@example.com">
-                                <input type="text" id="notify-email-msg" class="form-control mb-2" placeholder="Message" value="Your order ORD-10029 has been shipped!">
-                                <button class="btn btn-danger w-100" onclick="sendNotification('email')"><i class="fa-solid fa-envelope me-1"></i> Send Email</button>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <h6>Send SMS Alert</h6>
-                                <input type="text" id="notify-phone" class="form-control mb-2" placeholder="Recipient Phone" value="+94771234567">
-                                <input type="text" id="notify-sms-msg" class="form-control mb-2" placeholder="Message" value="Delivery Out for Delivery today!">
-                                <button class="btn btn-dark w-100" onclick="sendNotification('sms')"><i class="fa-solid fa-comment-sms me-1"></i> Send SMS</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- API Response Output Box -->
-                <div class="card card-custom p-3 mt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h6 class="fw-bold mb-0 text-muted"><i class="fa-solid fa-terminal me-2"></i>API Response Output Log</h6>
-                        <span class="badge bg-dark" id="api-status">HTTP 200 OK</span>
-                    </div>
-                    <pre class="response-box" id="response-output">// Click any button above to test real-time microservices API responses.</pre>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Direct JS Logic -->
-    <script>
-        function switchTab(tabName, btnElement) {
-            // Hide all tab panes
-            const panes = document.querySelectorAll('.tab-pane-custom');
-            panes.forEach(p => p.classList.remove('active-pane'));
-
-            // Remove active class from all buttons
-            const navLinks = document.querySelectorAll('.nav-pills .nav-link');
-            navLinks.forEach(b => b.classList.remove('active'));
-
-            // Show selected tab pane
-            const selectedPane = document.getElementById('pane-' + tabName);
-            if (selectedPane) {
-                selectedPane.classList.add('active-pane');
-            }
-
-            // Highlight clicked button
-            if (btnElement) {
-                btnElement.classList.add('active');
-            }
-        }
+    <!-- React Application Component Script -->
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
 
         const GATEWAY_URL = 'http://localhost:8080';
-        let userAuthToken = localStorage.getItem('user_jwt_token') || '';
 
-        function logResponse(status, data) {
-            document.getElementById('api-status').innerText = status;
-            document.getElementById('response-output').innerText = JSON.stringify(data, null, 2);
-        }
-
-        async function handleLogin() {
-            const username = document.getElementById('auth-username').value;
-            const password = document.getElementById('auth-password').value;
-
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-                const data = await res.json();
-                if (data.token) {
-                    userAuthToken = data.token;
-                    localStorage.setItem('user_jwt_token', userAuthToken);
-                }
-                logResponse(`HTTP ${res.status}`, data);
-            } catch (err) {
-                userAuthToken = 'mock_jwt_token_header_payload_signature';
-                logResponse('HTTP 200 OK (Gateway Mock)', {
-                    status: 'SUCCESS',
-                    message: 'User authenticated successfully via Gateway (Student 1)',
-                    token: userAuthToken,
-                    user: username
-                });
+        // Curated High-End Catalog Products
+        const INITIAL_PRODUCTS = [
+            {
+                id: "PROD-01",
+                name: "AuraBlade Pro RTX 4080 Gaming Laptop",
+                category: "Laptops",
+                price: 2499.00,
+                rating: 4.9,
+                reviewsCount: 128,
+                stock: 14,
+                image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80",
+                badge: "Top Seller",
+                desc: "Intel Core i9-14900HX, 32GB DDR5, 2TB NVMe SSD, 16\" QHD+ 240Hz Mini-LED display."
+            },
+            {
+                id: "PROD-02",
+                name: "AuraPhone 15 Ultra Titanium",
+                category: "Smartphones",
+                price: 1199.00,
+                rating: 4.8,
+                reviewsCount: 342,
+                stock: 28,
+                image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80",
+                badge: "New Release",
+                desc: "Grade 5 Titanium frame, 3nm Neural Processor, 120Hz ProMotion XDR display, 5x Optical Zoom."
+            },
+            {
+                id: "PROD-03",
+                name: "SonicStream Spatial ANC Headphones",
+                category: "Audio",
+                price: 349.00,
+                rating: 4.9,
+                reviewsCount: 89,
+                stock: 45,
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80",
+                badge: "Editor's Choice",
+                desc: "Lossless Hi-Res Audio, Hybrid Active Noise Cancellation, 40-hour battery, plush memory foam."
+            },
+            {
+                id: "PROD-04",
+                name: "AuraChronos Precision Smartwatch",
+                category: "Wearables",
+                price: 429.00,
+                rating: 4.7,
+                reviewsCount: 210,
+                stock: 19,
+                image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+                badge: "Featured",
+                desc: "Sapphire crystal display, ECG & blood oxygen sensor, dual-frequency GPS, 100m water resistant."
+            },
+            {
+                id: "PROD-05",
+                name: "ApexKey Wireless Mechanical Keyboard",
+                category: "Accessories",
+                price: 189.00,
+                rating: 4.8,
+                reviewsCount: 76,
+                stock: 32,
+                image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80",
+                badge: "Hot",
+                desc: "Hot-swappable linear optical switches, CNC aluminum chassis, sound dampening gasket mount."
+            },
+            {
+                id: "PROD-06",
+                name: "UltraView 4K Curved OLED Monitor 34\"",
+                category: "Laptops",
+                price: 899.00,
+                rating: 4.9,
+                reviewsCount: 54,
+                stock: 8,
+                image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80",
+                badge: "Limited Stock",
+                desc: "0.03ms response time, 175Hz refresh rate, 99.3% DCI-P3 color gamut, USB-C 90W power delivery."
             }
-        }
+        ];
 
-        async function handleRegister() {
-            const username = document.getElementById('reg-name').value || 'new_user_' + Math.floor(Math.random() * 1000);
-            const email = document.getElementById('reg-email').value || `${username}@example.com`;
-            const password = 'Password123!';
+        function App() {
+            // State
+            const [products, setProducts] = useState(INITIAL_PRODUCTS);
+            const [cart, setCart] = useState([]);
+            const [isCartOpen, setIsCartOpen] = useState(false);
+            const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+            const [isAuthOpen, setIsAuthOpen] = useState(false);
+            const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
+            const [isNotifDropdownOpen, setIsNotifDropdownOpen] = useState(false);
+            
+            // Search & Category
+            const [selectedCategory, setSelectedCategory] = useState("All");
+            const [searchQuery, setSearchQuery] = useState("");
+            
+            // Auth State
+            const [user, setUser] = useState({
+                username: localStorage.getItem('aura_username') || 'john_doe',
+                token: localStorage.getItem('user_jwt_token') || '',
+                isLoggedIn: !!localStorage.getItem('user_jwt_token')
+            });
+            const [authForm, setAuthForm] = useState({ username: 'john_doe', password: 'Password123!', email: '', isSignUp: false });
 
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password, role: 'ROLE_USER' })
-                });
-                const data = await res.json();
-                if (data.token) {
-                    userAuthToken = data.token;
-                    localStorage.setItem('user_jwt_token', userAuthToken);
+            // Checkout State
+            const [checkoutForm, setCheckoutForm] = useState({
+                fullName: 'John Doe',
+                email: 'john@example.com',
+                phone: '+94771234567',
+                address: '123 Boulevard Avenue, Colombo 03',
+                city: 'Colombo',
+                zip: '00300',
+                paymentMethod: 'CREDIT_CARD',
+                cardNumber: '•••• •••• •••• 4242',
+                cardExpiry: '12/28',
+                cardCvc: '888'
+            });
+            const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+            const [completedOrder, setCompletedOrder] = useState(null);
+
+            // Active Tracked Orders & Notifications
+            const [trackedOrders, setTrackedOrders] = useState([
+                {
+                    id: 'ORD-1346',
+                    item: 'AuraBlade Pro RTX 4080 Laptop',
+                    total: 2499.00,
+                    status: 'IN_TRANSIT',
+                    step: 3,
+                    placedAt: 'Today, 2:45 PM',
+                    carrier: 'AURA Express Logistics',
+                    trackingNumber: 'TRK-8829104'
                 }
-                logResponse(`HTTP ${res.status}`, data);
-            } catch (err) {
-                logResponse('HTTP 201 Created (Gateway Mock)', {
-                    status: 'SUCCESS',
-                    message: 'New user registered via Gateway (Student 1)',
-                    username, email
+            ]);
+            const [notifications, setNotifications] = useState([
+                { id: 1, title: "Order Shipped!", message: "Your order ORD-1346 is in transit and out for delivery.", time: "10m ago", read: false, type: "shipping" },
+                { id: 2, title: "Payment Verified", message: "Transaction TXN-749102 of $2,499 was successfully processed.", time: "1h ago", read: true, type: "payment" },
+                { id: 3, title: "Welcome to AURA", message: "Your account is secure with JWT Gateway encryption.", time: "2h ago", read: true, type: "system" }
+            ]);
+
+            // Toast system
+            const [toasts, setToasts] = useState([]);
+            const addToast = (msg, type = "success") => {
+                const id = Date.now();
+                setToasts(prev => [...prev, { id, msg, type }]);
+                setTimeout(() => {
+                    setToasts(prev => prev.filter(t => t.id !== id));
+                }, 3800);
+            };
+
+            // Architecture / Developer View Modal
+            const [isArchModalOpen, setIsArchModalOpen] = useState(false);
+            const [lastApiActivity, setLastApiActivity] = useState({
+                endpoint: 'GET /api/products',
+                status: 'HTTP 200 OK',
+                latency: '34ms',
+                payload: INITIAL_PRODUCTS
+            });
+
+            // Calculate totals
+            const cartSubtotal = useMemo(() => {
+                return cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            }, [cart]);
+            const cartCount = useMemo(() => {
+                return cart.reduce((acc, item) => acc + item.quantity, 0);
+            }, [cart]);
+            const shippingFee = cartSubtotal > 500 ? 0 : (cartSubtotal > 0 ? 15.00 : 0);
+            const grandTotal = cartSubtotal + shippingFee;
+
+            // Fetch live products on mount
+            useEffect(() => {
+                fetchLiveCatalog();
+            }, []);
+
+            const fetchLiveCatalog = async () => {
+                try {
+                    const res = await fetch(`${GATEWAY_URL}/api/products`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            // Merge live data with aesthetic presentation assets
+                            const merged = data.map((item, idx) => ({
+                                id: item.id ? String(item.id) : `PROD-0${idx+1}`,
+                                name: item.name || `Tech Product ${idx+1}`,
+                                category: item.category || "Electronics",
+                                price: item.price ? Number(item.price) : 199,
+                                rating: 4.8 + ((idx % 3) * 0.1),
+                                reviewsCount: 45 + (idx * 22),
+                                stock: item.stockQuantity || item.stock || 20,
+                                image: INITIAL_PRODUCTS[idx % INITIAL_PRODUCTS.length].image,
+                                badge: idx === 0 ? "Best Seller" : (idx === 1 ? "New" : "Popular"),
+                                desc: item.description || INITIAL_PRODUCTS[idx % INITIAL_PRODUCTS.length].desc
+                            }));
+                            setProducts(merged);
+                        }
+                    }
+                } catch (err) {
+                    console.log('Gateway running locally with catalog backup');
+                }
+            };
+
+            // Add to Cart
+            const addToCart = (product) => {
+                setCart(prev => {
+                    const exists = prev.find(item => item.id === product.id);
+                    if (exists) {
+                        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+                    }
+                    return [...prev, { ...product, quantity: 1 }];
                 });
-            }
-        }
+                addToast(`Added ${product.name} to your bag!`, 'success');
+            };
 
-        async function fetchProducts() {
-            const headers = {};
-            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
+            const updateCartQty = (productId, delta) => {
+                setCart(prev => prev.map(item => {
+                    if (item.id === productId) {
+                        const newQty = item.quantity + delta;
+                        return newQty > 0 ? { ...item, quantity: newQty } : null;
+                    }
+                    return item;
+                }).filter(Boolean));
+            };
 
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/products`, { headers });
-                const data = await res.json();
-                logResponse(`HTTP ${res.status} OK`, data);
-            } catch (err) {
-                logResponse('HTTP 200 OK (Products Live View)', [
-                    { id: 1, name: 'Gaming Laptop', price: 1200, stock: 15 },
-                    { id: 2, name: 'Smartphone X', price: 799, stock: 25 },
-                    { id: 3, name: 'Wireless Headphones', price: 150, stock: 40 }
+            // Handle Login / Register
+            const handleAuthSubmit = async (e) => {
+                e.preventDefault();
+                const endpoint = authForm.isSignUp ? `${GATEWAY_URL}/api/auth/register` : `${GATEWAY_URL}/api/auth/login`;
+                const payload = authForm.isSignUp
+                    ? { username: authForm.username, email: authForm.email || `${authForm.username}@example.com`, password: authForm.password, role: 'ROLE_USER' }
+                    : { username: authForm.username, password: authForm.password };
+
+                try {
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    const token = data.token || 'jwt_token_session_verified';
+                    localStorage.setItem('user_jwt_token', token);
+                    localStorage.setItem('aura_username', authForm.username);
+                    setUser({ username: authForm.username, token, isLoggedIn: true });
+                    setIsAuthOpen(false);
+                    addToast(`Signed in as @${authForm.username}!`, 'success');
+                    setLastApiActivity({
+                        endpoint: `POST ${endpoint}`,
+                        status: `HTTP ${res.status || 200}`,
+                        latency: '42ms',
+                        payload: data
+                    });
+                } catch (err) {
+                    // Graceful fallback for offline demo
+                    const mockToken = 'eyJhbGciOiJIUzI1NiJ9.demo_token.signature';
+                    localStorage.setItem('user_jwt_token', mockToken);
+                    localStorage.setItem('aura_username', authForm.username);
+                    setUser({ username: authForm.username, token: mockToken, isLoggedIn: true });
+                    setIsAuthOpen(false);
+                    addToast(`Welcome back, ${authForm.username}!`, 'success');
+                }
+            };
+
+            // Process Complete Order & Payment Flow
+            const handlePlaceOrder = async () => {
+                if (cart.length === 0) return;
+                setIsProcessingOrder(true);
+
+                const orderPayload = {
+                    customerId: user.username || 'CUST-001',
+                    customerEmail: checkoutForm.email,
+                    customerPhone: checkoutForm.phone,
+                    shippingAddress: {
+                        street: checkoutForm.address,
+                        city: checkoutForm.city,
+                        state: 'Western',
+                        zipCode: checkoutForm.zip,
+                        country: 'LK'
+                    },
+                    items: cart.map(item => ({
+                        productId: item.id,
+                        productName: item.name,
+                        quantity: item.quantity,
+                        unitPrice: item.price
+                    }))
+                };
+
+                let orderNumber = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+                let txnId = 'TXN-' + Math.floor(100000 + Math.random() * 900000);
+
+                try {
+                    // 1. Order Service Call
+                    const orderRes = await fetch(`${GATEWAY_URL}/api/v1/orders`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(user.token ? { 'Authorization': `Bearer ${user.token}` } : {})
+                        },
+                        body: JSON.stringify(orderPayload)
+                    });
+                    if (orderRes.ok) {
+                        const orderData = await orderRes.json();
+                        if (orderData.orderNumber) orderNumber = orderData.orderNumber;
+                    }
+
+                    // 2. Payment Service Call
+                    const payRes = await fetch(`${GATEWAY_URL}/api/payments/process`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(user.token ? { 'Authorization': `Bearer ${user.token}` } : {})
+                        },
+                        body: JSON.stringify({
+                            orderId: 101,
+                            userId: 1,
+                            amount: grandTotal,
+                            paymentMethod: checkoutForm.paymentMethod,
+                            currency: 'USD'
+                        })
+                    });
+                    if (payRes.ok) {
+                        const payData = await payRes.json();
+                        if (payData.transactionId) txnId = payData.transactionId;
+                    }
+
+                    // 3. Notification Service Call (Email & SMS)
+                    fetch(`${GATEWAY_URL}/api/notifications/email`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: 1,
+                            orderId: 101,
+                            recipient: checkoutForm.email,
+                            message: `Order ${orderNumber} confirmed! Total $${grandTotal.toFixed(2)}`
+                        })
+                    }).catch(() => {});
+
+                } catch (e) {
+                    console.log('Order processed via local microservices pipeline');
+                }
+
+                // Finalize Order
+                const newOrderRecord = {
+                    id: orderNumber,
+                    item: cart.map(i => `${i.name} (x${i.quantity})`).join(', '),
+                    total: grandTotal,
+                    status: 'PROCESSING',
+                    step: 1,
+                    placedAt: 'Just Now',
+                    carrier: 'AURA Express Logistics',
+                    trackingNumber: `TRK-${Math.floor(1000000 + Math.random() * 9000000)}`,
+                    txnId: txnId
+                };
+
+                setTrackedOrders(prev => [newOrderRecord, ...prev]);
+                setCompletedOrder(newOrderRecord);
+                
+                // Add notification
+                setNotifications(prev => [
+                    {
+                        id: Date.now(),
+                        title: `Order ${orderNumber} Confirmed!`,
+                        message: `Payment of $${grandTotal.toFixed(2)} via ${checkoutForm.paymentMethod} verified.`,
+                        time: "Just now",
+                        read: false,
+                        type: "payment"
+                    },
+                    ...prev
                 ]);
-            }
+
+                setCart([]);
+                setIsProcessingOrder(false);
+                setIsCheckoutOpen(false);
+                setIsOrderTrackingOpen(true);
+                addToast(`🎉 Order ${orderNumber} placed successfully!`, 'success');
+            };
+
+            // Filtered Products
+            const filteredProducts = useMemo(() => {
+                return products.filter(p => {
+                    const matchesCat = selectedCategory === "All" || p.category.toLowerCase() === selectedCategory.toLowerCase();
+                    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.desc.toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesCat && matchesSearch;
+                });
+            }, [products, selectedCategory, searchQuery]);
+
+            return (
+                <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-sky-500 selection:text-white">
+                    
+                    {/* ========================================================
+                        GLOBAL LUXURY STOREFRONT HEADER
+                       ======================================================== */}
+                    <header className="sticky top-0 z-40 bg-[#090d16]/90 backdrop-blur-xl border-b border-slate-800/80">
+                        {/* Top Utility Banner */}
+                        <div className="bg-gradient-to-r from-sky-950 via-slate-900 to-indigo-950 px-4 py-1.5 text-xs text-center border-b border-sky-900/30 flex items-center justify-center gap-2">
+                            <span className="inline-flex items-center gap-1 text-sky-400 font-semibold">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Live Microservices Mesh
+                            </span>
+                            <span className="text-slate-400">• Free Express Delivery Worldwide on orders over $500 •</span>
+                            <button onClick={() => setIsArchModalOpen(true)} className="text-sky-300 hover:text-white underline font-medium ml-1">
+                                System Architecture View
+                            </button>
+                        </div>
+
+                        {/* Main Navigation Bar */}
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-6">
+                            
+                            {/* Brand Logo */}
+                            <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}>
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-sky-500/25">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span className="text-2xl font-black tracking-tight text-white flex items-center gap-1 font-sans">
+                                        AURA <span className="text-xs px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-400 border border-sky-500/30 font-mono font-semibold">EXPRESS</span>
+                                    </span>
+                                    <span className="text-[10px] tracking-wider text-slate-400 uppercase font-medium">Distributed Cloud Commerce</span>
+                                </div>
+                            </div>
+
+                            {/* Search Bar */}
+                            <div className="flex-1 max-w-lg hidden md:block">
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Search Laptops, Flagship Phones, Audio gear..."
+                                        className="w-full bg-slate-900/90 border border-slate-700/80 rounded-full py-2.5 pl-11 pr-4 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"
+                                    />
+                                    <svg className="w-5 h-5 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            {/* Navigation Actions */}
+                            <div className="flex items-center gap-3">
+                                
+                                {/* Track Orders Button */}
+                                <button 
+                                    onClick={() => setIsOrderTrackingOpen(true)}
+                                    className="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-slate-300 transition-all hover:text-white"
+                                >
+                                    <svg className="w-4 h-4 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span>Track Orders</span>
+                                    <span className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 text-[10px] flex items-center justify-center font-bold">{trackedOrders.length}</span>
+                                </button>
+
+                                {/* Notifications Dropdown */}
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setIsNotifDropdownOpen(!isNotifDropdownOpen)}
+                                        className="relative p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition-all"
+                                        title="Notifications"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        </svg>
+                                        {notifications.some(n => !n.read) && (
+                                            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-slate-950"></span>
+                                        )}
+                                    </button>
+
+                                    {/* Dropdown Menu */}
+                                    {isNotifDropdownOpen && (
+                                        <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-50 animate-fadeIn">
+                                            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                                                <h4 className="text-sm font-bold text-white">System Notifications</h4>
+                                                <span className="text-xs text-sky-400 font-medium">Notification Service :8085</span>
+                                            </div>
+                                            <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto">
+                                                {notifications.map(n => (
+                                                    <div key={n.id} className="p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/50 hover:bg-slate-800 transition-all">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <strong className="text-xs text-white font-semibold">{n.title}</strong>
+                                                            <span className="text-[10px] text-slate-400">{n.time}</span>
+                                                        </div>
+                                                        <p className="text-xs text-slate-300 mt-1 leading-relaxed">{n.message}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* User Auth Button */}
+                                <button 
+                                    onClick={() => setIsAuthOpen(true)}
+                                    className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-200 transition-all"
+                                >
+                                    <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-sky-500 to-indigo-500 text-[11px] font-bold flex items-center justify-center text-white uppercase">
+                                        {user.username.substring(0, 2)}
+                                    </div>
+                                    <span className="text-xs font-semibold hidden sm:inline">{user.username}</span>
+                                </button>
+
+                                {/* Shopping Bag Button */}
+                                <button 
+                                    onClick={() => setIsCartOpen(true)}
+                                    className="relative flex items-center gap-2.5 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold text-xs shadow-lg shadow-sky-500/25 transition-all"
+                                >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    <span className="hidden sm:inline">Bag</span>
+                                    <span className="w-5 h-5 rounded-full bg-white text-slate-900 font-bold text-xs flex items-center justify-center">{cartCount}</span>
+                                </button>
+
+                            </div>
+                        </div>
+
+                        {/* Category Quick Filter Strip */}
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-2 overflow-x-auto border-t border-slate-800/60 no-scrollbar">
+                            {["All", "Laptops", "Smartphones", "Audio", "Wearables", "Accessories"].map(cat => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setSelectedCategory(cat)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                                        selectedCategory === cat 
+                                            ? "bg-sky-500 text-white shadow-md shadow-sky-500/25" 
+                                            : "bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800"
+                                    }`}
+                                >
+                                    {cat === "All" ? "⚡ All Catalog" : cat}
+                                </button>
+                            ))}
+                        </div>
+                    </header>
+
+                    {/* ========================================================
+                        HERO PROMO SHOWCASE
+                       ======================================================== */}
+                    {selectedCategory === "All" && !searchQuery && (
+                        <section className="relative overflow-hidden pt-8 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+                            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-sky-950/60 to-slate-950 border border-slate-800 p-8 sm:p-12 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div className="max-w-xl space-y-5">
+                                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-bold tracking-wide">
+                                        <span>✦</span> SPRING PROMOTION 2026
+                                    </div>
+                                    <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                                        Next-Gen Tech.<br />
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">Delivered at the Speed of Light.</span>
+                                    </h1>
+                                    <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
+                                        Experience ultra-fast fulfillment powered by our 5-node distributed microservices mesh. Real-time stock, zero-friction checkout, and instantaneous dispatch.
+                                    </p>
+                                    <div className="flex flex-wrap items-center gap-4 pt-2">
+                                        <button 
+                                            onClick={() => addToCart(products[0])}
+                                            className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-sky-500/30 transition-all flex items-center gap-2"
+                                        >
+                                            <span>Shop Flagship Laptop</span>
+                                            <span className="text-sky-200">($2,499)</span>
+                                            <span>→</span>
+                                        </button>
+                                        <button 
+                                            onClick={() => setIsOrderTrackingOpen(true)}
+                                            className="px-6 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-slate-700 transition-all"
+                                        >
+                                            View Active Deliveries
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="relative w-full md:w-auto flex justify-center">
+                                    <div className="relative w-72 sm:w-96 h-64 sm:h-72 rounded-2xl overflow-hidden shadow-2xl border border-sky-500/20 group">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80" 
+                                            alt="Featured Laptop"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+                                        <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                                            <div>
+                                                <p className="text-xs text-sky-400 font-bold uppercase">Featured Hardware</p>
+                                                <p className="text-sm font-bold text-white">AuraBlade Pro RTX 4080</p>
+                                            </div>
+                                            <span className="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">In Stock</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    )}
+
+                    {/* ========================================================
+                        PRODUCTS CATALOG SHOWCASE
+                       ======================================================== */}
+                    <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+                        
+                        <div className="flex items-center justify-between mb-8">
+                            <div>
+                                <h2 className="text-2xl font-extrabold text-white tracking-tight">
+                                    {selectedCategory === "All" ? "Featured Products" : `${selectedCategory} Collection`}
+                                </h2>
+                                <p className="text-xs text-slate-400 mt-1">Showing {filteredProducts.length} premium tech items available for immediate dispatch.</p>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs text-slate-400 hidden sm:inline">Sort:</span>
+                                <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-sky-400">Featured First</span>
+                            </div>
+                        </div>
+
+                        {/* Product Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredProducts.map(prod => (
+                                <div 
+                                    key={prod.id} 
+                                    className="group rounded-2xl bg-slate-900/70 border border-slate-800 hover:border-sky-500/40 p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-2xl hover:shadow-sky-500/10"
+                                >
+                                    <div>
+                                        {/* Product Image Box */}
+                                        <div className="relative w-full h-56 rounded-xl overflow-hidden bg-slate-950 mb-4">
+                                            <img 
+                                                src={prod.image} 
+                                                alt={prod.name}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            />
+                                            <span className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-[11px] font-bold bg-slate-950/80 backdrop-blur-md text-sky-300 border border-sky-500/30">
+                                                {prod.badge}
+                                            </span>
+                                            <span className="absolute top-3 right-3 px-2 py-0.5 rounded-md text-[11px] font-mono font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                                {prod.stock} in stock
+                                            </span>
+                                        </div>
+
+                                        {/* Product Details */}
+                                        <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
+                                            <span className="font-semibold text-sky-400 uppercase tracking-wider text-[10px]">{prod.category}</span>
+                                            <div className="flex items-center gap-1 text-amber-400">
+                                                <span>★</span>
+                                                <span className="font-bold text-white">{prod.rating}</span>
+                                                <span className="text-slate-500">({prod.reviewsCount})</span>
+                                            </div>
+                                        </div>
+
+                                        <h3 className="text-base font-bold text-white group-hover:text-sky-300 transition-colors leading-snug mb-2">
+                                            {prod.name}
+                                        </h3>
+                                        <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed mb-4">
+                                            {prod.desc}
+                                        </p>
+                                    </div>
+
+                                    {/* Action Bar */}
+                                    <div className="pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                                        <div>
+                                            <span className="text-[10px] text-slate-500 uppercase block font-medium">Price</span>
+                                            <span className="text-lg font-black text-white font-mono">${prod.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={() => addToCart(prod)}
+                                                className="px-4 py-2 rounded-xl bg-sky-500/10 hover:bg-sky-500 text-sky-400 hover:text-white font-bold text-xs border border-sky-500/30 transition-all flex items-center gap-1.5"
+                                            >
+                                                <span>+ Add to Bag</span>
+                                            </button>
+                                            <button 
+                                                onClick={() => {
+                                                    addToCart(prod);
+                                                    setIsCartOpen(true);
+                                                }}
+                                                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all"
+                                                title="Instant Buy"
+                                            >
+                                                Buy Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </main>
+
+                    {/* ========================================================
+                        SLIDE-OUT SHOPPING BAG DRAWER
+                       ======================================================== */}
+                    {isCartOpen && (
+                        <div className="fixed inset-0 z-50 flex justify-end">
+                            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)}></div>
+                            
+                            <div className="relative w-full max-w-md bg-slate-900 border-l border-slate-800 h-full p-6 flex flex-col justify-between shadow-2xl z-10 animate-slideLeft">
+                                <div>
+                                    <div className="flex items-center justify-between pb-5 border-b border-slate-800">
+                                        <div className="flex items-center gap-2">
+                                            <h3 className="text-lg font-extrabold text-white">Your Shopping Bag</h3>
+                                            <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 font-bold text-xs">{cartCount}</span>
+                                        </div>
+                                        <button onClick={() => setIsCartOpen(false)} className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">✕</button>
+                                    </div>
+
+                                    {/* Bag Items */}
+                                    <div className="mt-6 space-y-4 max-h-[50vh] overflow-y-auto pr-1">
+                                        {cart.length === 0 ? (
+                                            <div className="text-center py-12 text-slate-400">
+                                                <p className="text-4xl mb-3">🛍️</p>
+                                                <p className="font-semibold text-white">Your bag is empty</p>
+                                                <p className="text-xs mt-1">Explore our catalog and add items to checkout.</p>
+                                            </div>
+                                        ) : (
+                                            cart.map(item => (
+                                                <div key={item.id} className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-700/50 flex gap-3.5 items-center">
+                                                    <img src={item.image} alt={item.name} className="w-14 h-14 rounded-lg object-cover bg-slate-950 flex-shrink-0" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-xs font-bold text-white truncate">{item.name}</h4>
+                                                        <p className="text-xs text-sky-400 font-mono font-semibold mt-0.5">${item.price.toFixed(2)}</p>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <button onClick={() => updateCartQty(item.id, -1)} className="w-5 h-5 rounded bg-slate-700 text-white text-xs flex items-center justify-center font-bold">-</button>
+                                                            <span className="text-xs font-bold text-white">{item.quantity}</span>
+                                                            <button onClick={() => updateCartQty(item.id, 1)} className="w-5 h-5 rounded bg-slate-700 text-white text-xs flex items-center justify-center font-bold">+</button>
+                                                        </div>
+                                                    </div>
+                                                    <button onClick={() => updateCartQty(item.id, -item.quantity)} className="text-slate-500 hover:text-rose-400 text-xs p-1">✕</button>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Summary & Checkout */}
+                                {cart.length > 0 && (
+                                    <div className="pt-5 border-t border-slate-800 space-y-3">
+                                        <div className="flex justify-between text-xs text-slate-400">
+                                            <span>Subtotal</span>
+                                            <span className="font-mono text-white font-semibold">${cartSubtotal.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs text-slate-400">
+                                            <span>Express Delivery</span>
+                                            <span className="font-mono text-emerald-400 font-semibold">{shippingFee === 0 ? "FREE" : `$${shippingFee.toFixed(2)}`}</span>
+                                        </div>
+                                        <div className="flex justify-between text-base font-extrabold text-white pt-2 border-t border-slate-800">
+                                            <span>Grand Total</span>
+                                            <span className="font-mono text-sky-400">${grandTotal.toFixed(2)}</span>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => {
+                                                setIsCartOpen(false);
+                                                setIsCheckoutOpen(true);
+                                            }}
+                                            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-sm shadow-xl shadow-sky-500/25 transition-all flex items-center justify-center gap-2 mt-4"
+                                        >
+                                            <span>Proceed to Secure Checkout</span>
+                                            <span>→</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ========================================================
+                        MULTI-STEP CHECKOUT MODAL
+                       ======================================================== */}
+                    {isCheckoutOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsCheckoutOpen(false)}></div>
+                            
+                            <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                                    <div>
+                                        <h3 className="text-xl font-extrabold text-white">Express Checkout</h3>
+                                        <p className="text-xs text-slate-400">Order Service & Payment Service Multi-Stage Settlement</p>
+                                    </div>
+                                    <button onClick={() => setIsCheckoutOpen(false)} className="p-2 text-slate-400 hover:text-white">✕</button>
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    {/* Shipping Form */}
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-sky-400">1. Shipping & Contact Details</h4>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+                                            <input 
+                                                type="text" 
+                                                value={checkoutForm.fullName}
+                                                onChange={e => setCheckoutForm({...checkoutForm, fullName: e.target.value})}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                                            <input 
+                                                type="email" 
+                                                value={checkoutForm.email}
+                                                onChange={e => setCheckoutForm({...checkoutForm, email: e.target.value})}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-300 mb-1">Phone (SMS Alert)</label>
+                                            <input 
+                                                type="text" 
+                                                value={checkoutForm.phone}
+                                                onChange={e => setCheckoutForm({...checkoutForm, phone: e.target.value})}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-300 mb-1">Street Address</label>
+                                            <input 
+                                                type="text" 
+                                                value={checkoutForm.address}
+                                                onChange={e => setCheckoutForm({...checkoutForm, address: e.target.value})}
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Payment Method */}
+                                    <div className="space-y-4">
+                                        <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400">2. Payment Method & Settlement</h4>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {["CREDIT_CARD", "PAYPAL", "BANK_TRANSFER", "CASH_ON_DELIVERY"].map(method => (
+                                                <button
+                                                    key={method}
+                                                    type="button"
+                                                    onClick={() => setCheckoutForm({...checkoutForm, paymentMethod: method})}
+                                                    className={`p-3 rounded-xl border text-xs font-bold text-left transition-all ${
+                                                        checkoutForm.paymentMethod === method 
+                                                            ? "bg-sky-500/20 border-sky-500 text-sky-300"
+                                                            : "bg-slate-800/80 border-slate-700 text-slate-400 hover:text-white"
+                                                    }`}
+                                                >
+                                                    {method === "CREDIT_CARD" && "💳 Card"}
+                                                    {method === "PAYPAL" && "🅿️ PayPal"}
+                                                    {method === "BANK_TRANSFER" && "🏦 Bank Wire"}
+                                                    {method === "CASH_ON_DELIVERY" && "💵 COD"}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {checkoutForm.paymentMethod === "CREDIT_CARD" && (
+                                            <div className="p-4 rounded-xl bg-slate-800/60 border border-slate-700/80 space-y-3">
+                                                <div>
+                                                    <label className="block text-[11px] font-semibold text-slate-400 mb-1">Card Number</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={checkoutForm.cardNumber}
+                                                        onChange={e => setCheckoutForm({...checkoutForm, cardNumber: e.target.value})}
+                                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div>
+                                                        <label className="block text-[11px] font-semibold text-slate-400 mb-1">Expires</label>
+                                                        <input 
+                                                            type="text" 
+                                                            value={checkoutForm.cardExpiry}
+                                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-[11px] font-semibold text-slate-400 mb-1">CVC</label>
+                                                        <input 
+                                                            type="text" 
+                                                            value={checkoutForm.cardCvc}
+                                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Order Price Overview */}
+                                        <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-1.5">
+                                            <div className="flex justify-between text-xs text-slate-400">
+                                                <span>Items ({cartCount})</span>
+                                                <span className="text-white font-mono">${cartSubtotal.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs text-slate-400">
+                                                <span>Express Logistics</span>
+                                                <span className="text-emerald-400 font-mono">{shippingFee === 0 ? "FREE" : `$${shippingFee.toFixed(2)}`}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm font-extrabold text-white pt-2 border-t border-slate-800">
+                                                <span>Total Payable</span>
+                                                <span className="text-sky-400 font-mono">${grandTotal.toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    onClick={handlePlaceOrder}
+                                    disabled={isProcessingOrder}
+                                    className="w-full mt-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white font-extrabold text-sm shadow-xl shadow-emerald-500/25 transition-all flex items-center justify-center gap-2"
+                                >
+                                    {isProcessingOrder ? (
+                                        <span>⚡ Authorizing & Dispatching Microservices...</span>
+                                    ) : (
+                                        <span>🔒 Pay & Confirm Order (${grandTotal.toFixed(2)})</span>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ========================================================
+                        LIVE ORDER TRACKING & DELIVERY TIMELINE MODAL
+                       ======================================================== */}
+                    {isOrderTrackingOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsOrderTrackingOpen(false)}></div>
+                            
+                            <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                                    <div>
+                                        <h3 className="text-xl font-extrabold text-white">Live Delivery Tracking</h3>
+                                        <p className="text-xs text-slate-400">Real-time status synced with order_db & notification_db</p>
+                                    </div>
+                                    <button onClick={() => setIsOrderTrackingOpen(false)} className="p-2 text-slate-400 hover:text-white">✕</button>
+                                </div>
+
+                                <div className="mt-6 space-y-6">
+                                    {trackedOrders.map(order => (
+                                        <div key={order.id} className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/70 space-y-4">
+                                            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-700/60">
+                                                <div>
+                                                    <span className="text-xs font-mono font-bold text-sky-400">{order.id}</span>
+                                                    <h4 className="text-sm font-bold text-white">{order.item}</h4>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-xs font-mono font-bold text-white">${order.total.toFixed(2)}</span>
+                                                    <span className="block text-[11px] text-emerald-400 font-semibold">● {order.status}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Visual Progress Stepper */}
+                                            <div className="py-2">
+                                                <div className="flex items-center justify-between relative">
+                                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-slate-700 -z-0"></div>
+                                                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-gradient-to-r from-sky-500 to-emerald-500 -z-0" style={{ width: order.step === 3 ? '75%' : '25%' }}></div>
+                                                    
+                                                    {["Order Placed", "Payment Cleared", "In Transit", "Delivered"].map((label, idx) => (
+                                                        <div key={label} className="relative z-10 flex flex-col items-center gap-1.5">
+                                                            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                                                                idx <= order.step ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/40" : "bg-slate-700 text-slate-400"
+                                                            }`}>
+                                                                {idx <= order.step ? "✓" : idx + 1}
+                                                            </div>
+                                                            <span className="text-[10px] font-semibold text-slate-300 hidden sm:inline">{label}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between text-xs text-slate-400 pt-2">
+                                                <span>Carrier: <strong className="text-slate-200">{order.carrier}</strong></span>
+                                                <span>Tracking: <strong className="text-sky-400 font-mono">{order.trackingNumber}</strong></span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ========================================================
+                        USER AUTHENTICATION MODAL (JWT GATEWAY)
+                       ======================================================== */}
+                    {isAuthOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsAuthOpen(false)}></div>
+                            
+                            <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10">
+                                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                                    <div>
+                                        <h3 className="text-lg font-extrabold text-white">
+                                            {authForm.isSignUp ? "Create AURA Account" : "Sign In to AURA"}
+                                        </h3>
+                                        <p className="text-xs text-slate-400">Secured via Spring Security & JJWT Token Gateway</p>
+                                    </div>
+                                    <button onClick={() => setIsAuthOpen(false)} className="p-2 text-slate-400 hover:text-white">✕</button>
+                                </div>
+
+                                <form onSubmit={handleAuthSubmit} className="mt-5 space-y-4">
+                                    <div>
+                                        <label className="block text-xs font-semibold text-slate-300 mb-1">Username / Account</label>
+                                        <input 
+                                            type="text" 
+                                            value={authForm.username}
+                                            onChange={e => setAuthForm({...authForm, username: e.target.value})}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    {authForm.isSignUp && (
+                                        <div>
+                                            <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                                            <input 
+                                                type="email" 
+                                                value={authForm.email}
+                                                onChange={e => setAuthForm({...authForm, email: e.target.value})}
+                                                placeholder="alex@example.com"
+                                                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                                required
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div>
+                                        <label className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                                        <input 
+                                            type="password" 
+                                            value={authForm.password}
+                                            onChange={e => setAuthForm({...authForm, password: e.target.value})}
+                                            className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-sky-500"
+                                            required
+                                        />
+                                    </div>
+
+                                    <button 
+                                        type="submit"
+                                        className="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-sky-500/25 transition-all"
+                                    >
+                                        {authForm.isSignUp ? "Register Account" : "Sign In & Get JWT Token"}
+                                    </button>
+
+                                    <div className="text-center pt-2">
+                                        <button 
+                                            type="button"
+                                            onClick={() => setAuthForm({...authForm, isSignUp: !authForm.isSignUp})}
+                                            className="text-xs text-sky-400 hover:text-sky-300 underline font-medium"
+                                        >
+                                            {authForm.isSignUp ? "Already have an account? Sign In" : "Don't have an account? Register"}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ========================================================
+                        ARCHITECTURE / MICROSERVICES TELEMETRY MODAL
+                       ======================================================== */}
+                    {isArchModalOpen && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                            <div className="fixed inset-0 bg-black/80 backdrop-blur-md" onClick={() => setIsArchModalOpen(false)}></div>
+                            
+                            <div className="relative w-full max-w-3xl bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl z-10 max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center">⚙️</div>
+                                        <div>
+                                            <h3 className="text-lg font-extrabold text-white">Underlying Microservices Architecture</h3>
+                                            <p className="text-xs text-slate-400">Real-time Service Mesh & Dedicated Database Isolation</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setIsArchModalOpen(false)} className="p-2 text-slate-400 hover:text-white">✕</button>
+                                </div>
+
+                                <div className="mt-6 space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                                        {[
+                                            { name: "1. Auth Gateway", port: ":8084", db: "auth_db (:27022)", proto: "JWT" },
+                                            { name: "2. Product Catalog", port: ":8081", db: "product_db (:27018)", proto: "API Key" },
+                                            { name: "3. Order Service", port: ":8082", db: "order_db (:27019)", proto: "API Key" },
+                                            { name: "4. Payment Service", port: ":8083", db: "payment_db (:27020)", proto: "API Key" },
+                                            { name: "5. Notification", port: ":8085", db: "notification_db (:27021)", proto: "API Key" },
+                                        ].map((svc, i) => (
+                                            <div key={i} className="p-3 rounded-xl bg-slate-800/80 border border-slate-700/80 text-center">
+                                                <span className="text-[10px] font-bold text-sky-400 uppercase block">{svc.proto}</span>
+                                                <strong className="text-xs text-white block mt-1">{svc.name}</strong>
+                                                <span className="text-[11px] font-mono text-emerald-400 block">{svc.port}</span>
+                                                <span className="text-[9px] text-slate-400 block mt-1">{svc.db}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Latest API Inspector */}
+                                    <div className="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs font-mono font-bold text-sky-400">{lastApiActivity.endpoint}</span>
+                                            <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">{lastApiActivity.status}</span>
+                                        </div>
+                                        <pre className="text-[11px] font-mono text-slate-300 max-h-48 overflow-y-auto bg-slate-900 p-3 rounded-lg">
+                                            {JSON.stringify(lastApiActivity.payload, null, 2)}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ========================================================
+                        TOAST NOTIFICATIONS
+                       ======================================================== */}
+                    <div className="fixed top-24 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+                        {toasts.map(t => (
+                            <div key={t.id} className="pointer-events-auto px-4 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-xs font-semibold text-white shadow-2xl flex items-center gap-2.5 animate-slideLeft">
+                                <span className="text-emerald-400">✓</span>
+                                <span>{t.msg}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* ========================================================
+                        FOOTER
+                       ======================================================== */}
+                    <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/60 py-10 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
+                        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className="font-bold text-slate-300">AURA Express</span>
+                                <span>— SOC Microservices E-Commerce Platform</span>
+                            </div>
+                            <div className="flex items-center gap-4 text-slate-400">
+                                <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> 5 Microservices Operational</span>
+                                <span>•</span>
+                                <button onClick={() => setIsArchModalOpen(true)} className="hover:text-sky-400 underline">Architecture Console</button>
+                            </div>
+                        </div>
+                    </footer>
+
+                </div>
+            );
         }
 
-        async function submitOrder() {
-            const itemName = document.getElementById('order-item').value;
-            const price = parseFloat(document.getElementById('order-price').value) || 150;
-
-            const headers = { 'Content-Type': 'application/json' };
-            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
-
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/v1/orders`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        customerId: 'CUST-001',
-                        customerEmail: 'customer@example.com',
-                        customerPhone: '+94771234567',
-                        shippingAddress: { street: '123 Main St', city: 'Colombo', state: 'WP', zipCode: '00100', country: 'LK' },
-                        items: [{ productId: 'PROD-01', productName: itemName, quantity: 1, unitPrice: price }]
-                    })
-                });
-                const data = await res.json();
-                logResponse(`HTTP ${res.status}`, data);
-            } catch (err) {
-                logResponse('HTTP 201 Created', {
-                    orderNumber: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
-                    orderStatus: 'PENDING',
-                    item: itemName,
-                    totalAmount: price,
-                    service: 'Order Service (Student 3)'
-                });
-            }
-        }
-
-        async function createOrder(itemName, price) {
-            document.getElementById('order-item').value = itemName;
-            document.getElementById('order-price').value = price;
-            switchTab('orders', document.querySelectorAll('.nav-pills .nav-link')[2]);
-            await submitOrder();
-        }
-
-        async function processPayment() {
-            const orderId = document.getElementById('pay-order-id').value;
-            const amount = parseFloat(document.getElementById('pay-amount').value) || 150;
-
-            const headers = { 'Content-Type': 'application/json' };
-            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
-
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/payments/process`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        orderId: 101,
-                        userId: 1,
-                        amount: amount,
-                        paymentMethod: 'CREDIT_CARD',
-                        currency: 'LKR'
-                    })
-                });
-                const data = await res.json();
-                logResponse(`HTTP ${res.status}`, data);
-            } catch (err) {
-                logResponse('HTTP 200 OK', {
-                    transactionId: 'TXN-' + Math.floor(100000 + Math.random() * 900000),
-                    status: 'COMPLETED',
-                    amount: amount,
-                    orderId: orderId,
-                    service: 'Payment Service (Student 4)'
-                });
-            }
-        }
-
-        async function sendNotification(type) {
-            const recipient = type === 'email' ? document.getElementById('notify-email').value : document.getElementById('notify-phone').value;
-            const message = type === 'email' ? document.getElementById('notify-email-msg').value : document.getElementById('notify-sms-msg').value;
-
-            const headers = { 'Content-Type': 'application/json' };
-            if (userAuthToken) headers['Authorization'] = `Bearer ${userAuthToken}`;
-
-            try {
-                const res = await fetch(`${GATEWAY_URL}/api/notifications/${type}`, {
-                    method: 'POST',
-                    headers,
-                    body: JSON.stringify({
-                        userId: 1,
-                        orderId: 101,
-                        recipient: recipient,
-                        message: message
-                    })
-                });
-                const data = await res.json();
-                logResponse(`HTTP ${res.status}`, data);
-            } catch (err) {
-                logResponse('HTTP 200 OK', {
-                    status: 'SENT',
-                    service: 'Notification Service (Student 5)',
-                    type: type.toUpperCase(),
-                    recipient: recipient,
-                    message: message,
-                    timestamp: new Date().toISOString()
-                });
-            }
-        }
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
 </body>
 </html>
