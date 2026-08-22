@@ -1,6 +1,9 @@
 version: '3.8'
 
 services:
+  # ==========================================
+  # Frontend Client App (Port 3000)
+  # ==========================================
   client-app:
     build:
       context: ./client-app
@@ -8,10 +11,11 @@ services:
     container_name: client-app
     ports:
       - "3000:80"
-    depends_on:
-      - api-gateway
     restart: always
 
+  # ==========================================
+  # Central API Gateway (Port 8080)
+  # ==========================================
   api-gateway:
     build:
       context: ./api-gateway
@@ -34,6 +38,9 @@ services:
       - notification-service
     restart: always
 
+  # ==========================================
+  # 1. Auth Service & Dedicated MongoDB
+  # ==========================================
   auth-service:
     build:
       context: ./auth-service
@@ -43,8 +50,23 @@ services:
       - "8084:8084"
     environment:
       - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATA_MONGODB_URI=mongodb://auth-mongodb:27017/auth_db
+    depends_on:
+      - auth-mongodb
     restart: always
 
+  auth-mongodb:
+    image: mongo:7.0
+    container_name: auth-mongodb
+    restart: always
+    ports:
+      - "27022:27017"
+    volumes:
+      - auth_mongodb_data:/data/db
+
+  # ==========================================
+  # 2. Product Catalog Service & Dedicated MongoDB
+  # ==========================================
   product-service:
     build:
       context: ./product-service
@@ -54,8 +76,23 @@ services:
       - "8081:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATA_MONGODB_URI=mongodb://product-mongodb:27017/product_db
+    depends_on:
+      - product-mongodb
     restart: always
 
+  product-mongodb:
+    image: mongo:7.0
+    container_name: product-mongodb
+    restart: always
+    ports:
+      - "27018:27017"
+    volumes:
+      - product_mongodb_data:/data/db
+
+  # ==========================================
+  # 3. Order Service & Dedicated MongoDB
+  # ==========================================
   order-service:
     build:
       context: ./order-service
@@ -75,10 +112,13 @@ services:
     container_name: order-mongodb
     restart: always
     ports:
-      - "27018:27017"
+      - "27019:27017"
     volumes:
       - order_mongodb_data:/data/db
 
+  # ==========================================
+  # 4. Payment Service & Dedicated MongoDB
+  # ==========================================
   payment-service:
     build:
       context: ./payment-service
@@ -88,8 +128,23 @@ services:
       - "8083:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=default
+      - SPRING_DATA_MONGODB_URI=mongodb://payment-mongodb:27017/payment_db
+    depends_on:
+      - payment-mongodb
     restart: always
 
+  payment-mongodb:
+    image: mongo:7.0
+    container_name: payment-mongodb
+    restart: always
+    ports:
+      - "27020:27017"
+    volumes:
+      - payment_mongodb_data:/data/db
+
+  # ==========================================
+  # 5. Notification Service & Dedicated MongoDB
+  # ==========================================
   notification-service:
     build:
       context: ./notification-service
@@ -99,11 +154,31 @@ services:
       - "8085:8085"
     environment:
       - SPRING_PROFILES_ACTIVE=default
-      - SPRING_DATA_MONGODB_URI=mongodb://order-mongodb:27017/notificationdb
+      - SPRING_DATA_MONGODB_URI=mongodb://notification-mongodb:27017/notification_db
     depends_on:
-      - order-mongodb
+      - notification-mongodb
     restart: always
 
+  notification-mongodb:
+    image: mongo:7.0
+    container_name: notification-mongodb
+    restart: always
+    ports:
+      - "27021:27017"
+    volumes:
+      - notification_mongodb_data:/data/db
+
+# ==========================================
+# Persistent Named Volumes for 5 Databases
+# ==========================================
 volumes:
+  auth_mongodb_data:
+    driver: local
+  product_mongodb_data:
+    driver: local
   order_mongodb_data:
+    driver: local
+  payment_mongodb_data:
+    driver: local
+  notification_mongodb_data:
     driver: local

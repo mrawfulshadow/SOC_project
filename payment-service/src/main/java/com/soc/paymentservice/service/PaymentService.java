@@ -42,7 +42,7 @@ public class PaymentService {
         return paymentRepository.findByUserId(userId);
     }
 
-    public Optional<Payment> getPaymentById(Long id) {
+    public Optional<Payment> getPaymentById(String id) {
         return paymentRepository.findById(id);
     }
 
@@ -50,7 +50,7 @@ public class PaymentService {
         return paymentRepository.findByTransactionId(transactionId);
     }
 
-    public Optional<Payment> refundPayment(Long id, String reason) {
+    public Optional<Payment> refundPayment(String id, String reason) {
         Optional<Payment> paymentOpt = paymentRepository.findById(id);
         if (paymentOpt.isPresent()) {
             Payment payment = paymentOpt.get();
@@ -64,3 +64,4 @@ public class PaymentService {
         return Optional.empty();
     }
 }
+

@@ -1,6 +1,8 @@
 package com.soc.paymentservice.model;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +11,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "payments")
+@Document(collection = "payments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,25 +19,21 @@ import java.time.LocalDateTime;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false, unique = true)
+    @Indexed(unique = true)
     private String transactionId;
 
-    @Column(nullable = false)
+    @Indexed
     private Long orderId;
 
-    @Column(nullable = false)
+    @Indexed
     private Long userId;
 
-    @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(nullable = false)
     private String paymentMethod; // e.g., CREDIT_CARD, PAYPAL, BANK_TRANSFER, CASH_ON_DELIVERY
 
-    @Column(nullable = false)
     private String status; // PENDING, COMPLETED, FAILED, REFUNDED
 
     private String currency; // LKR, USD, EUR
@@ -46,3 +43,4 @@ public class Payment {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

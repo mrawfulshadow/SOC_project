@@ -41,15 +41,17 @@ flowchart TD
 
 ---
 
-## 👥 Team Work Breakdown Matrix
+## 👥 Team Work Breakdown Matrix & Database Architecture
 
-| Student | Microservice / Role | Key Responsibilities | Port | Interactive Swagger UI |
-|---|---|---|:---:|---|
-| **Student 1 (Lead)** | **API Gateway & Auth Service** | Gateway Routing, JWT Gatekeeper Filter, API Key Auto-Injection, CORS, Rate Limiting, User Auth & Registration | `8080` / `8084` | [Auth Service Swagger](http://localhost:8084/swagger-ui.html) |
-| **Student 2** | **Product Catalog Service** | Product & Category CRUD, Inventory Management, `X-API-KEY` Security Filter | `8081` | [Product Service Swagger](http://localhost:8081/swagger-ui.html) |
-| **Student 3** | **Order Service** | Order Placement, Lifecycle Tracking (`PENDING` ➔ `DELIVERED`), Webhook Updates | `8082` | [Order Service Swagger](http://localhost:8082/swagger-ui.html) |
-| **Student 4** | **Payment Service** | Transaction Processing, Payment History, Refund Processing, `X-API-KEY` Security | `8083` | [Payment Service Swagger](http://localhost:8083/swagger-ui/index.html) |
-| **Student 5** | **Notification Service** | Email & SMS Notifications, Dispatch Logs, `X-API-KEY` Security Filter | `8085` | [Notification Service Swagger](http://localhost:8085/swagger-ui/index.html) |
+Each microservice implements the **Database-per-Service** pattern with a dedicated, isolated MongoDB instance:
+
+| Student | Microservice / Role | Service Port | Dedicated MongoDB Port | Database Name | MongoDB Compass URI |
+|---|---|:---:|:---:|:---:|---|
+| **Student 1 (Lead)** | **API Gateway & Auth Service** | `8080` / `8084` | `27022` | `auth_db` | `mongodb://localhost:27022` |
+| **Student 2** | **Product Catalog Service** | `8081` | `27018` | `product_db` | `mongodb://localhost:27018` |
+| **Student 3** | **Order Service** | `8082` | `27019` | `order_db` | `mongodb://localhost:27019` |
+| **Student 4** | **Payment Service** | `8083` | `27020` | `payment_db` | `mongodb://localhost:27020` |
+| **Student 5** | **Notification Service** | `8085` | `27021` | `notification_db` | `mongodb://localhost:27021` |
 
 ---
 
@@ -72,7 +74,7 @@ The single entry point for all client requests.
 
 ### 2. 🔐 Auth Service (`Port 8084`)
 Provides centralized user authentication and JWT token issuance.
-- **Database:** H2 In-Memory (`jdbc:h2:mem:authdb`)
+- **Database:** MongoDB (`mongodb://localhost:27022/auth_db`) - Collections: `users`, `api_keys`
 - **Security:** Spring Security + BCrypt Password Encoder + JJWT
 
 | Method | Endpoint | Description | Auth Required |
@@ -85,6 +87,7 @@ Provides centralized user authentication and JWT token issuance.
 
 ### 3. 📦 Product Service (`Port 8081`)
 Manages catalog inventory and details.
+- **Database:** MongoDB (`mongodb://localhost:27018/product_db`) - Collection: `products`
 - **Header Security:** `X-API-KEY: PRODUCT-SERVICE-SECRET-KEY`
 
 | Method | Endpoint | Description | Auth Required |
@@ -98,6 +101,7 @@ Manages catalog inventory and details.
 
 ### 4. 🛒 Order Service (`Port 8082`)
 Manages shopping cart, order placement, and order state progression.
+- **Database:** MongoDB (`mongodb://localhost:27019/order_db`) - Collection: `orders`
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
@@ -111,6 +115,7 @@ Manages shopping cart, order placement, and order state progression.
 
 ### 5. 💳 Payment Service (`Port 8083`)
 Processes payment transactions, maintains audit history, and handles refunds.
+- **Database:** MongoDB (`mongodb://localhost:27020/payment_db`) - Collection: `payments`
 - **Header Security:** `X-API-KEY: payment-secret-key-123`
 
 | Method | Endpoint | Description | Auth Required |
@@ -124,6 +129,7 @@ Processes payment transactions, maintains audit history, and handles refunds.
 
 ### 6. 🔔 Notification Service (`Port 8085`)
 Dispatches automated Email and SMS notifications for orders and payments.
+- **Database:** MongoDB (`mongodb://localhost:27021/notification_db`) - Collection: `notifications`
 - **Header Security:** `X-API-KEY: notification-secret-key-123`
 
 | Method | Endpoint | Description | Auth Required |

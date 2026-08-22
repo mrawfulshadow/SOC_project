@@ -8,23 +8,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Document(collection = "users")
+import java.time.LocalDateTime;
+
+@Document(collection = "api_keys")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class ApiKey {
 
     @Id
     private String id;
 
     @Indexed(unique = true)
-    private String username;
-
-    private String password;
+    private String service;
 
     @Indexed(unique = true)
-    private String email;
+    private String apiKey;
 
-    private String role;
+    private String headerName;
+    private int targetPort;
+    private String status;
+    private String description;
+    private LocalDateTime createdAt;
 }

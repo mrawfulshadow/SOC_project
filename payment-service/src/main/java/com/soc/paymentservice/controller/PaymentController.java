@@ -30,7 +30,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Payment> getPaymentById(@PathVariable Long id) {
+    public ResponseEntity<Payment> getPaymentById(@PathVariable String id) {
         return paymentService.getPaymentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -44,7 +44,7 @@ public class PaymentController {
     }
 
     @PostMapping("/refund/{id}")
-    public ResponseEntity<?> refundPayment(@PathVariable Long id, @RequestBody(required = false) Map<String, String> request) {
+    public ResponseEntity<?> refundPayment(@PathVariable String id, @RequestBody(required = false) Map<String, String> request) {
         String reason = (request != null) ? request.get("reason") : "Customer request";
         return paymentService.refundPayment(id, reason)
                 .map(payment -> ResponseEntity.ok((Object) payment))

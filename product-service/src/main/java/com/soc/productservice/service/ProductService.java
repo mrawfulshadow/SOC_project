@@ -12,7 +12,8 @@ public class ProductService {
     private ProductRepository repository;
 
     public List<Product> getAllProducts() { return repository.findAll(); }
-    public Product getProductById(Long id) { return repository.findById(id).orElse(null); }
+    public Product getProductById(String id) { return repository.findById(id).orElse(null); }
     public Product createProduct(Product product) { return repository.save(product); }
-    public void deleteProduct(Long id) { repository.deleteById(id); }
+    public void deleteProduct(String id) { repository.deleteById(id); }
 }
+
