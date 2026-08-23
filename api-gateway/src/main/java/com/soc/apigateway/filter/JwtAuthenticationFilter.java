@@ -1,8 +1,8 @@
 package com.soc.apigateway.filter;
 
+import com.soc.apigateway.util.JwtUtil;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -18,14 +18,25 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Value("${api-keys.product-service:PRODUCT-SERVICE-SECRET-KEY}")
+    private String apiKeyProduct;
+
+    @Value("${api-keys.order-service:order-secret-key-123}")
+    private String apiKeyOrder;
+
+    @Value("${api-keys.payment-service:payment-secret-key-123}")
+    private String apiKeyPayment;
+
+    @Value("${api-keys.notification-service:notification-secret-key-123}")
+    private String apiKeyNotification;
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
@@ -40,11 +51,6 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             "/api-docs/**",
             "/api-docs"
     );
-
-    private Key getSigningKey() {
-        byte[] keyBytes = io.jsonwebtoken.io.Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -71,13 +77,12 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
         String token = authHeader.substring(7);
 
-        try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+        if (!jwtUtil.validateToken(token)) {
+            return onError(exchange, "Invalid or Expired JWT Token", HttpStatus.UNAUTHORIZED);
+        }
 
+        try {
+            Claims claims = jwtUtil.getClaimsFromToken(token);
             String username = claims.getSubject();
             String role = claims.get("role", String.class);
 
