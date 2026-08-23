@@ -1,5 +1,7 @@
 package com.soc.paymentservice.service;
 
+import com.soc.paymentservice.dto.PaymentRequestDTO;
+import com.soc.paymentservice.dto.PaymentResponseDTO;
 import com.soc.paymentservice.model.Payment;
 import com.soc.paymentservice.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentService {
@@ -17,40 +20,56 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    public Payment processPayment(Payment payment) {
-        payment.setTransactionId("TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        if (payment.getCurrency() == null || payment.getCurrency().isEmpty()) {
-            payment.setCurrency("LKR");
-        }
-        
-        // Mock processing logic: Amount <= 0 fails, otherwise completes
-        if (payment.getAmount() != null && payment.getAmount().compareTo(BigDecimal.ZERO) > 0) {
-            payment.setStatus("COMPLETED");
+    public PaymentResponseDTO processPayment(PaymentRequestDTO request) {
+        String transactionId = "TXN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String currency = (request.getCurrency() != null && !request.getCurrency().isEmpty()) ? request.getCurrency() : "LKR";
+
+        String status;
+        String notes = request.getNotes();
+
+        // Server-side validation and processing
+        if (request.getAmount() != null && request.getAmount().compareTo(BigDecimal.ZERO) > 0) {
+            status = "COMPLETED";
         } else {
-            payment.setStatus("FAILED");
-            payment.setNotes("Invalid transaction amount");
+            status = "FAILED";
+            notes = "Invalid transaction amount";
         }
-        
+
         LocalDateTime now = LocalDateTime.now();
-        payment.setCreatedAt(now);
-        payment.setUpdatedAt(now);
-        
-        return paymentRepository.save(payment);
+
+        Payment payment = Payment.builder()
+                .transactionId(transactionId)
+                .orderId(request.getOrderId())
+                .userId(request.getUserId())
+                .amount(request.getAmount())
+                .paymentMethod(request.getPaymentMethod())
+                .status(status)
+                .currency(currency)
+                .notes(notes)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+
+        Payment saved = paymentRepository.save(payment);
+        return mapToResponse(saved);
     }
 
-    public List<Payment> getPaymentHistoryByUserId(Long userId) {
-        return paymentRepository.findByUserId(userId);
+    public List<PaymentResponseDTO> getPaymentHistoryByUserId(Long userId) {
+        return paymentRepository.findByUserId(userId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
-    public Optional<Payment> getPaymentById(String id) {
-        return paymentRepository.findById(id);
+    public Optional<PaymentResponseDTO> getPaymentById(String id) {
+        return paymentRepository.findById(id).map(this::mapToResponse);
     }
 
-    public Optional<Payment> getPaymentByTransactionId(String transactionId) {
-        return paymentRepository.findByTransactionId(transactionId);
+    public Optional<PaymentResponseDTO> getPaymentByTransactionId(String transactionId) {
+        return paymentRepository.findByTransactionId(transactionId).map(this::mapToResponse);
     }
 
-    public Optional<Payment> refundPayment(String id, String reason) {
+    public Optional<PaymentResponseDTO> refundPayment(String id, String reason) {
         Optional<Payment> paymentOpt = paymentRepository.findById(id);
         if (paymentOpt.isPresent()) {
             Payment payment = paymentOpt.get();
@@ -58,10 +77,28 @@ public class PaymentService {
                 payment.setStatus("REFUNDED");
                 payment.setNotes(reason != null ? reason : "Refund processed successfully");
                 payment.setUpdatedAt(LocalDateTime.now());
-                return Optional.of(paymentRepository.save(payment));
+                Payment updated = paymentRepository.save(payment);
+                return Optional.of(mapToResponse(updated));
             }
         }
         return Optional.empty();
+    }
+
+    public PaymentResponseDTO mapToResponse(Payment payment) {
+        if (payment == null) return null;
+        return PaymentResponseDTO.builder()
+                .id(payment.getId())
+                .transactionId(payment.getTransactionId())
+                .orderId(payment.getOrderId())
+                .userId(payment.getUserId())
+                .amount(payment.getAmount())
+                .paymentMethod(payment.getPaymentMethod())
+                .status(payment.getStatus())
+                .currency(payment.getCurrency())
+                .notes(payment.getNotes())
+                .createdAt(payment.getCreatedAt())
+                .updatedAt(payment.getUpdatedAt())
+                .build();
     }
 }
 

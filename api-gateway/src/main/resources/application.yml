@@ -8,11 +8,14 @@ spring:
     gateway:
       cors-configurations:
         '[/**]':
-          allowedOrigins: "*"
+          allowedOrigins:
+            - "http://localhost:3000"
+            - "http://127.0.0.1:3000"
           allowedMethods:
             - GET
             - POST
             - PUT
+            - PATCH
             - DELETE
             - OPTIONS
           allowedHeaders: "*"
@@ -46,10 +49,17 @@ spring:
             - Path=/api/notifications/**
 
 jwt:
-  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 api-keys:
-  product-service: PRODUCT-SERVICE-SECRET-KEY
-  order-service: order-secret-key-123
-  payment-service: payment-secret-key-123
-  notification-service: notification-secret-key-123
+  product-service: ${PRODUCT_API_KEY:PRODUCT-SERVICE-SECRET-KEY}
+  order-service: ${ORDER_API_KEY:order-secret-key-123}
+  payment-service: ${PAYMENT_API_KEY:payment-secret-key-123}
+  notification-service: ${NOTIFICATION_API_KEY:notification-secret-key-123}
+
+gateway:
+  rate-limit:
+    requests-per-minute: ${GATEWAY_RATE_LIMIT_RPM:60}
+    window-seconds: ${GATEWAY_RATE_LIMIT_WINDOW:60}
+  trusted-proxies: ${GATEWAY_TRUSTED_PROXIES:127.0.0.1,::1,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}

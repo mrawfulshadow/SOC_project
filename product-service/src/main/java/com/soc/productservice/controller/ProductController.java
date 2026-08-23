@@ -27,12 +27,24 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> create(@RequestBody Product product) { 
+    public ResponseEntity<?> create(
+            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @jakarta.validation.Valid @RequestBody Product product) { 
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: Only users with ROLE_ADMIN can create products");
+        }
         return new ResponseEntity<>(service.createProduct(product), HttpStatus.CREATED); 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) { 
+    public ResponseEntity<?> delete(
+            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @PathVariable String id) { 
+        if (!"ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access Denied: Only users with ROLE_ADMIN can delete products");
+        }
         service.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }

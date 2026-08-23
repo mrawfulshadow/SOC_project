@@ -23,6 +23,9 @@ management:
       exposure:
         include: health,info,metrics
 
+webhook:
+  secret: ${WEBHOOK_SECRET:soc-payment-webhook-secret-key-2026}
+
 logging:
   level:
     root: INFO

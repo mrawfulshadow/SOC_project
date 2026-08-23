@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
@@ -26,12 +27,17 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Value("${jwt.secret}")
     private String secret;
 
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
     private static final List<String> OPEN_ENDPOINTS = List.of(
             "/api/auth/register",
             "/api/auth/login",
             "/api/auth/validate",
-            "/swagger-ui",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
             "/v3/api-docs",
+            "/api-docs/**",
             "/api-docs"
     );
 
@@ -43,10 +49,14 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        String rawPath = request.getURI().getRawPath();
         String path = request.getURI().getPath();
 
-        boolean isOpenEndpoint = OPEN_ENDPOINTS.stream().anyMatch(path::contains);
-        if (isOpenEndpoint) {
+        if (isInvalidPath(rawPath, path)) {
+            return onError(exchange, "Access Denied: Invalid path traversal or forbidden characters detected", HttpStatus.BAD_REQUEST);
+        }
+
+        if (isOpenEndpoint(path)) {
             return chain.filter(exchange);
         }
 
@@ -81,6 +91,33 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         } catch (Exception e) {
             return onError(exchange, "Invalid or Expired JWT Token", HttpStatus.UNAUTHORIZED);
         }
+    }
+
+    private boolean isInvalidPath(String rawPath, String path) {
+        if (rawPath == null || path == null) {
+            return true;
+        }
+        String lowerRawPath = rawPath.toLowerCase();
+        return rawPath.contains("..")
+                || path.contains("..")
+                || lowerRawPath.contains("%2e%2e")
+                || rawPath.contains(";")
+                || path.contains(";")
+                || lowerRawPath.contains("%2f")
+                || lowerRawPath.contains("%5c")
+                || path.contains("\\");
+    }
+
+    private boolean isOpenEndpoint(String path) {
+        if (path == null) {
+            return false;
+        }
+        String normalizedPath = path.endsWith("/") && path.length() > 1
+                ? path.substring(0, path.length() - 1)
+                : path;
+
+        return OPEN_ENDPOINTS.stream()
+                .anyMatch(pattern -> PATH_MATCHER.match(pattern, path) || PATH_MATCHER.match(pattern, normalizedPath));
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, String err, HttpStatus httpStatus) {

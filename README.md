@@ -3,32 +3,45 @@
 ![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x%20%2F%204.x-brightgreen?style=for-the-badge&logo=springboot)
 ![Spring Cloud Gateway](https://img.shields.io/badge/Spring_Cloud-Gateway-blue?style=for-the-badge&logo=spring)
-![Security](https://img.shields.io/badge/Security-JWT%20%2B%20API%20Keys-red?style=for-the-badge&logo=jsonwebtokens)
+![Security Hardened](https://img.shields.io/badge/Security-Zero%20Trust%20Hardened-brightgreen?style=for-the-badge&logo=shield)
 ![Docker](https://img.shields.io/badge/Docker-Compose-blue?style=for-the-badge&logo=docker)
 ![Swagger](https://img.shields.io/badge/OpenAPI-Swagger_UI-green?style=for-the-badge&logo=swagger)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub_Actions_Passed-success?style=for-the-badge&logo=githubactions)
 
-An enterprise-grade, microservices-based **Online E-Commerce & Delivery Platform** built with **Java 17**, **Spring Boot**, **Spring Cloud Gateway**, **JWT Authentication**, and **Docker**.
+An enterprise-grade, fully secured microservices-based **Online E-Commerce & Delivery Platform** built with **Java 17**, **Spring Boot**, **Spring Cloud Gateway**, **JWT Authentication**, **HMAC-SHA256 Signatures**, **Role-Based Access Control (RBAC)**, **Isolated Docker Networks**, and **OWASP Hardening**.
 
 ---
 
 ## 📐 System Architecture
 
-The ecosystem uses an **API Gateway pattern** where all external client requests pass through a centralized Spring Cloud Gateway entry point (Port `8080`). The Gateway validates user JWT tokens, enforces rate limiting, and forwards authorized requests to independent downstream microservices while auto-injecting internal `X-API-KEY` headers.
+All client requests route through the centralized **Spring Cloud Gateway** (`Port 8080`). The Gateway enforces rate-limiting with trusted proxy validation, checks path traversal sequences, validates JWT signatures, and enriches requests with user roles and internal API keys before forwarding them over the private bridge network (`soc-internal-net`).
 
 ```mermaid
 flowchart TD
     Client[📱 Client App / Postman / Frontend]
     
-    subgraph GatewayLayer ["🚪 Gateway Layer"]
-        Gateway["⚙️ API Gateway (Port 8080)<br/>• Dynamic Routing<br/>• JWT Gatekeeper<br/>• X-API-KEY Auto-Inject<br/>• Rate Limiting (60 req/min)"]
+    subgraph GatewayLayer ["🚪 Perimeter Gateway Layer"]
+        Gateway["⚙️ API Gateway (Port 8080)<br/>• AntPathMatcher Whitelist<br/>• Anti-Traversal Protection<br/>• Sliding-Window Rate Limiter (60 req/min)<br/>• JWT Validation & Downstream Header Injection<br/>• Restricted CORS"]
     end
 
-    subgraph CoreServices ["🧱 Microservices Ecosystem"]
-        AuthService["🔐 Auth Service (Port 8084)<br/>• JWT Generation & Validation<br/>• User Registration & Login"]
-        ProductService["📦 Product Service (Port 8081)<br/>• Catalog & Inventory CRUD<br/>• Protected via X-API-KEY"]
-        OrderService["🛒 Order Service (Port 8082)<br/>• Order Placement & Lifecycle<br/>• Delivery Tracking & Status"]
-        PaymentService["💳 Payment Service (Port 8083)<br/>• Transaction & Refunds<br/>• Protected via X-API-KEY"]
-        NotificationService["🔔 Notification Service (Port 8085)<br/>• Email & SMS Alerts<br/>• Protected via X-API-KEY"]
+    subgraph InternalNetwork ["🔒 Isolated Docker Network (soc-internal-net)"]
+        AuthService["🔐 Auth Service (Port 8084)<br/>• JWT Generation (HMAC-SHA256)<br/>• BCrypt Password Hashing<br/>• Non-Prod Initializers (@Profile('!prod'))"]
+        ProductService["📦 Product Service (Port 8081)<br/>• Catalog CRUD & Admin RBAC<br/>• Constant-Time API Key Validation"]
+        OrderService["🛒 Order Service (Port 8082)<br/>• Order Placement & Lifecycle<br/>• Ownership Verification (BOLA/IDOR)<br/>• HMAC-SHA256 Webhook Signatures"]
+        PaymentService["💳 Payment Service (Port 8083)<br/>• Payment DTO Layer & Validation<br/>• Admin-Only Refunds<br/>• User History Ownership Verification"]
+        NotificationService["🔔 Notification Service (Port 8085)<br/>• Decoupled DTO Dispatches<br/>• Email & SMS Alert Logs"]
+
+        DB1[(auth_db)]
+        DB2[(product_db)]
+        DB3[(order_db)]
+        DB4[(payment_db)]
+        DB5[(notification_db)]
+
+        AuthService --- DB1
+        ProductService --- DB2
+        OrderService --- DB3
+        PaymentService --- DB4
+        NotificationService --- DB5
     end
 
     Client -->|HTTP / REST| Gateway
@@ -41,116 +54,116 @@ flowchart TD
 
 ---
 
-## 👥 Team Work Breakdown Matrix & Database Architecture
+## 👥 Microservices & Database Architecture
 
-Each microservice implements the **Database-per-Service** pattern with a dedicated, isolated MongoDB instance:
+Each microservice implements the **Database-per-Service** pattern with a dedicated MongoDB container. In Docker Compose, database containers do not expose public host ports and communicate exclusively within `soc-internal-net` with root authentication enabled:
 
-| Student | Microservice / Role | Service Port | Dedicated MongoDB Port | Database Name | MongoDB Compass URI |
-|---|---|:---:|:---:|:---:|---|
-| **Student 1 (Lead)** | **API Gateway & Auth Service** | `8080` / `8084` | `27022` | `auth_db` | `mongodb://localhost:27022` |
-| **Student 2** | **Product Catalog Service** | `8081` | `27018` | `product_db` | `mongodb://localhost:27018` |
-| **Student 3** | **Order Service** | `8082` | `27019` | `order_db` | `mongodb://localhost:27019` |
-| **Student 4** | **Payment Service** | `8083` | `27020` | `payment_db` | `mongodb://localhost:27020` |
-| **Student 5** | **Notification Service** | `8085` | `27021` | `notification_db` | `mongodb://localhost:27021` |
+| Student | Microservice / Role | Service Port | Database Name | Internal Mongo Host | Security Layer |
+|---|---|:---:|:---:|---|---|
+| **Student 1 (Lead)** | **API Gateway & Auth Service** | `8080` / `8084` | `auth_db` | `mongo-auth:27017` | JWT, Whitelist AntPathMatcher, Rate Limiter |
+| **Student 2** | **Product Catalog Service** | `8081` | `product_db` | `mongo-product:27017` | `X-API-KEY` Constant-Time, `ROLE_ADMIN` RBAC |
+| **Student 3** | **Order Service** | `8082` | `order_db` | `mongo-order:27017` | `X-API-KEY`, HMAC Webhooks, BOLA Checks |
+| **Student 4** | **Payment Service** | `8083` | `payment_db` | `mongo-payment:27017` | `X-API-KEY`, DTO Layer, Admin Refunds |
+| **Student 5** | **Notification Service** | `8085` | `notification_db` | `mongo-notification:27017` | `X-API-KEY`, DTO Encapsulation |
 
 ---
 
 ## 🚀 Microservices Overview & REST API Specifications
 
 ### 1. 🚪 API Gateway (`Port 8080`)
-The single entry point for all client requests.
 - **Dynamic Routing Rules:**
   - `/api/auth/**` ➔ Auth Service (`http://localhost:8084`)
-  - `/api/products/**` ➔ Product Service (`http://localhost:8081`)
-  - `/api/orders/**` ➔ Order Service (`http://localhost:8082`)
+  - `/api/products/**`, `/products/**` ➔ Product Service (`http://localhost:8081`)
+  - `/api/orders/**`, `/api/v1/orders/**` ➔ Order Service (`http://localhost:8082`)
   - `/api/payments/**` ➔ Payment Service (`http://localhost:8083`)
   - `/api/notifications/**` ➔ Notification Service (`http://localhost:8085`)
-- **Key Features:**
-  - **JWT Authentication Filter:** Validates `Authorization: Bearer <token>` and propagates `X-User-Name` & `X-User-Role` downstream.
-  - **Auto-Inject API Key Filter:** Seamlessly attaches service-specific `X-API-KEY` headers before invoking downstream services.
-  - **Rate Limiting:** Protects endpoints against abuse (60 requests/min per IP).
+- **Security Features:**
+  - `AntPathMatcher` exact pattern whitelist matching (prevents substring bypass).
+  - Path traversal and semicolon injection sanitization.
+  - Proxy-aware sliding-window rate limiting (60 requests/minute).
+  - Automatic `X-API-KEY`, `X-User-Name`, and `X-User-Role` header injection.
+  - Strict CORS policy (locked to `http://localhost:3000`, `http://127.0.0.1:3000`).
 
 ---
 
 ### 2. 🔐 Auth Service (`Port 8084`)
-Provides centralized user authentication and JWT token issuance.
-- **Database:** MongoDB (`mongodb://localhost:27022/auth_db`) - Collections: `users`, `api_keys`
-- **Security:** Spring Security + BCrypt Password Encoder + JJWT
+- **Database:** MongoDB (`auth_db`)
+- **Security:** Spring Security + BCrypt + JJWT HMAC-SHA256 (`@Profile("!prod")` seeders).
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Register a new user | Public |
-| `POST` | `/api/auth/login` | Authenticate user & receive JWT token | Public |
-| `GET` | `/api/auth/validate` | Validate JWT token (`?token=...`) | Public |
+| `POST` | `/api/auth/register` | Register new user account | Public |
+| `POST` | `/api/auth/login` | Authenticate credentials & get JWT | Public |
+| `GET` | `/api/auth/validate` | Verify JWT token validity | Public |
 
 ---
 
 ### 3. 📦 Product Service (`Port 8081`)
-Manages catalog inventory and details.
-- **Database:** MongoDB (`mongodb://localhost:27018/product_db`) - Collection: `products`
-- **Header Security:** `X-API-KEY: PRODUCT-SERVICE-SECRET-KEY`
+- **Database:** MongoDB (`product_db`)
+- **Security:** Constant-time `X-API-KEY` validation + `ROLE_ADMIN` RBAC for write/delete operations.
 
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|---|
-| `GET` | `/products` | Retrieve all products | `X-API-KEY` |
-| `GET` | `/products/{id}` | Get product details by ID | `X-API-KEY` |
-| `POST` | `/products` | Create a new product entry | `X-API-KEY` |
-| `DELETE` | `/products/{id}` | Delete product by ID | `X-API-KEY` |
+| Method | Endpoint | Description | Auth Required | Role Required |
+|---|---|---|---|:---:|
+| `GET` | `/products`, `/api/products` | Retrieve all products | `X-API-KEY` / JWT | Any |
+| `GET` | `/products/{id}` | Get product details by ID | `X-API-KEY` / JWT | Any |
+| `POST` | `/products` | Create product entry | `X-API-KEY` / JWT | `ROLE_ADMIN` |
+| `DELETE` | `/products/{id}` | Delete product by ID | `X-API-KEY` / JWT | `ROLE_ADMIN` |
 
 ---
 
 ### 4. 🛒 Order Service (`Port 8082`)
-Manages shopping cart, order placement, and order state progression.
-- **Database:** MongoDB (`mongodb://localhost:27019/order_db`) - Collection: `orders`
+- **Database:** MongoDB (`order_db`)
+- **Security:** BOLA/IDOR ownership checks + HMAC-SHA256 signature verification on webhooks.
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
-| `POST` | `/api/v1/orders` | Place a new order | JWT Bearer |
-| `GET` | `/api/v1/orders/{id}` | Fetch order details by ID | JWT Bearer |
-| `GET` | `/api/v1/orders` | List orders (supports filters) | JWT Bearer |
+| `POST` | `/api/v1/orders` | Place new order with validated items | JWT Bearer |
+| `GET` | `/api/v1/orders/{id}` | Fetch order details (Owner or Admin) | JWT Bearer |
+| `GET` | `/api/v1/orders` | List caller's orders (or all if Admin) | JWT Bearer |
 | `PATCH` | `/api/v1/orders/{id}/status` | Update order status | JWT Bearer |
-| `POST` | `/api/v1/orders/{id}/payment-webhook` | Payment callback trigger | Internal |
+| `PATCH` | `/api/v1/orders/{id}/delivery` | Update shipping dispatch details | JWT Bearer |
+| `DELETE` | `/api/v1/orders/{id}` | Cancel order (Owner or Admin) | JWT Bearer |
+| `POST` | `/api/v1/orders/{id}/payment-webhook` | Payment callback (`X-Signature-SHA256`) | HMAC-SHA256 |
 
 ---
 
 ### 5. 💳 Payment Service (`Port 8083`)
-Processes payment transactions, maintains audit history, and handles refunds.
-- **Database:** MongoDB (`mongodb://localhost:27020/payment_db`) - Collection: `payments`
-- **Header Security:** `X-API-KEY: payment-secret-key-123`
+- **Database:** MongoDB (`payment_db`)
+- **Security:** Decoupled `PaymentRequestDTO` / `PaymentResponseDTO`, IDOR protection on history, Admin-only refunds.
 
-| Method | Endpoint | Description | Auth Required |
-|---|---|---|---|
-| `POST` | `/api/payments/process` | Process new payment | `X-API-KEY` |
-| `GET` | `/api/payments/history/{userId}` | Retrieve user transaction history | `X-API-KEY` |
-| `GET` | `/api/payments/{id}` | Fetch transaction by ID | `X-API-KEY` |
-| `POST` | `/api/payments/refund/{id}` | Process a payment refund | `X-API-KEY` |
+| Method | Endpoint | Description | Auth Required | Role Required |
+|---|---|---|---|:---:|
+| `POST` | `/api/payments/process` | Process new payment | `X-API-KEY` / JWT | Any |
+| `GET` | `/api/payments/history/{userId}` | Retrieve user transaction history | `X-API-KEY` / JWT | Owner or Admin |
+| `GET` | `/api/payments/{id}` | Fetch transaction by ID | `X-API-KEY` / JWT | Any |
+| `POST` | `/api/payments/refund/{id}` | Process payment refund | `X-API-KEY` / JWT | `ROLE_ADMIN` |
 
 ---
 
 ### 6. 🔔 Notification Service (`Port 8085`)
-Dispatches automated Email and SMS notifications for orders and payments.
-- **Database:** MongoDB (`mongodb://localhost:27021/notification_db`) - Collection: `notifications`
-- **Header Security:** `X-API-KEY: notification-secret-key-123`
+- **Database:** MongoDB (`notification_db`)
+- **Security:** Decoupled `NotificationRequestDTO` / `NotificationResponseDTO` with Bean Validation.
 
 | Method | Endpoint | Description | Auth Required |
 |---|---|---|---|
-| `POST` | `/api/notifications/email` | Dispatch Email alert | `X-API-KEY` |
-| `POST` | `/api/notifications/sms` | Dispatch SMS alert | `X-API-KEY` |
-| `GET` | `/api/notifications/user/{userId}` | Fetch user notification logs | `X-API-KEY` |
+| `POST` | `/api/notifications/email` | Dispatch validated Email alert | `X-API-KEY` / JWT |
+| `POST` | `/api/notifications/sms` | Dispatch validated SMS alert | `X-API-KEY` / JWT |
+| `GET` | `/api/notifications/user/{userId}` | Fetch user notification logs | `X-API-KEY` / JWT |
+| `GET` | `/api/notifications/{id}` | Fetch notification by ID | `X-API-KEY` / JWT |
 
 ---
 
 ## 🧪 End-to-End API Testing Guide
 
-### Step A: Register a New User
+### Step A: Register User or Admin
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-        "username": "john_doe",
+        "username": "alice",
         "password": "Password123!",
-        "email": "john@example.com",
-        "role": "ROLE_USER"
+        "email": "alice@example.com",
+        "role": "ROLE_ADMIN"
       }'
 ```
 
@@ -159,58 +172,60 @@ curl -X POST http://localhost:8080/api/auth/register \
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-        "username": "john_doe",
+        "username": "alice",
         "password": "Password123!"
       }'
 ```
-*Extract the `"token"` value from the JSON response.*
 
-### Step C: Execute Request via API Gateway
+### Step C: Execute Protected Request via API Gateway
 ```bash
-curl -X GET http://localhost:8080/api/payments/history/5 \
+curl -X GET http://localhost:8080/api/products \
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>"
 ```
-*The API Gateway validates your JWT and automatically attaches `X-API-KEY: payment-secret-key-123` upstream.*
+
+### Step D: Execute Payment Webhook Callback (with HMAC Signature)
+```bash
+curl -X POST http://localhost:8080/api/v1/orders/ORD-12345/payment-webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Signature-SHA256: <HMAC_HEX_SIGNATURE>" \
+  -d '{
+        "paymentTransactionId": "TXN-998877",
+        "paymentStatus": "PAID",
+        "amount": 1500.00,
+        "paymentGateway": "STRIPE",
+        "note": "Payment confirmed"
+      }'
+```
 
 ---
 
 ## 🐳 Quick Start & Deployment Guide
 
-### Option 1: Run Entire Ecosystem with Docker Compose (Recommended)
-
-Ensure Docker Desktop is running, then execute from the project root:
-
+### Configuration Setup
+Copy `.env.example` to `.env` and set your production secrets:
 ```bash
-# Build and launch all microservices in background
+cp .env.example .env
+```
+
+### Run Entire Ecosystem with Docker Compose
+```bash
+# Build and launch all microservices and isolated databases
 docker compose up --build -d
 
-# View real-time aggregated logs
+# View logs across all services
 docker compose logs -f
 
-# Shut down all microservices
+# Stop and remove containers
 docker compose down
 ```
 
-### Option 2: Run Microservices Individually with Maven
-
+### Run Automated Tests & Security Scans
 ```bash
-# Run Auth Service
-cd auth-service && ./mvnw spring-boot:run
+# Run unit & regression tests across all services
+mvn clean test
 
-# Run Product Service
-cd product-service && ./mvnw spring-boot:run
-
-# Run Order Service
-cd order-service && ./mvnw spring-boot:run
-
-# Run Payment Service
-cd payment-service && ./mvnw spring-boot:run
-
-# Run Notification Service
-cd notification-service && ./mvnw spring-boot:run
-
-# Run API Gateway
-cd api-gateway && ./mvnw spring-boot:run
+# Run OWASP Dependency Vulnerability Scan
+mvn org.owasp:dependency-check-maven:check
 ```
 
 ---
