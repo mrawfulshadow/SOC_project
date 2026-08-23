@@ -1,0 +1,119 @@
+name: SOC Security & CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# Cancel in-progress runs for the same branch on new pushes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ============================================================
+# JOB 1: Build, Test & Security Scan — Java Microservices
+# ============================================================
+jobs:
+  java-services:
+    name: "${{ matrix.service }} — Build, Test & Scan"
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false        # Don't cancel other services if one fails
+      matrix:
+        service:
+          - api-gateway
+          - auth-service
+          - product-service
+          - order-service
+          - payment-service
+          - notification-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── Java Setup ──────────────────────────────────────────
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      # ── Unit & Security Regression Tests ────────────────────
+      - name: Run Unit & Security Regression Tests
+        working-directory: ${{ matrix.service }}
+        run: mvn clean test --no-transfer-progress
+
+      # ── Upload Surefire Test Reports ─────────────────────────
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports-${{ matrix.service }}
+          path: ${{ matrix.service }}/target/surefire-reports/
+          if-no-files-found: warn
+
+      # ── OWASP Dependency Vulnerability Scan ─────────────────
+      - name: Run OWASP Dependency Check
+        working-directory: ${{ matrix.service }}
+        run: mvn org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=8 --no-transfer-progress
+        continue-on-error: true
+
+      - name: Upload OWASP Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-report-${{ matrix.service }}
+          path: ${{ matrix.service }}/target/dependency-check-report.html
+          if-no-files-found: ignore
+
+      # ── Docker Image Build Verification ─────────────────────
+      - name: Build Docker Image
+        working-directory: ${{ matrix.service }}
+        run: |
+          docker build \
+            --tag soc/${{ matrix.service }}:ci-${{ github.sha }} \
+            --label "git.sha=${{ github.sha }}" \
+            --label "git.branch=${{ github.ref_name }}" \
+            .
+
+# ============================================================
+# JOB 2: Build Docker Image — Frontend Client App
+# ============================================================
+  client-app:
+    name: "client-app — Docker Build"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Client App Docker Image
+        working-directory: client-app
+        run: |
+          docker build \
+            --tag soc/client-app:ci-${{ github.sha }} \
+            --label "git.sha=${{ github.sha }}" \
+            --label "git.branch=${{ github.ref_name }}" \
+            .
+
+# ============================================================
+# JOB 3: CI Gate — All jobs must pass before merge is allowed
+# ============================================================
+  ci-gate:
+    name: "CI Gate — All checks passed"
+    runs-on: ubuntu-latest
+    needs: [ java-services, client-app ]
+    if: always()
+
+    steps:
+      - name: Check all jobs succeeded
+        run: |
+          if [[ "${{ needs.java-services.result }}" != "success" || "${{ needs.client-app.result }}" != "success" ]]; then
+            echo "❌ One or more CI jobs failed. Blocking merge."
+            exit 1
+          fi
+          echo "✅ All CI jobs passed."
