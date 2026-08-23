@@ -1,0 +1,46 @@
+# =====================================================
+# CODEOWNERS — SOC Microservices Monorepo
+# =====================================================
+# Each line is a file pattern followed by one or more
+# owners (GitHub usernames or team names).
+# The last matching pattern takes precedence.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# =====================================================
+
+# Global fallback — Student Lead reviews everything not explicitly listed
+*                             @StudentLead
+
+# Root configuration files
+/.gitignore                   @StudentLead
+/.env.example                 @StudentLead
+/docker-compose.yml           @StudentLead
+/CONTRIBUTING.md              @StudentLead
+/README.md                    @StudentLead
+
+# CI/CD workflows
+/.github/                     @StudentLead
+
+# API Gateway & Auth Service (Student 1 — Lead)
+/api-gateway/                 @StudentLead
+/auth-service/                @StudentLead
+
+# Product Catalog Service (Student 2)
+/product-service/             @Student2
+
+# Order Service (Student 3)
+/order-service/               @Student3
+
+# Payment Service (Student 4)
+/payment-service/             @Student4
+
+# Notification Service (Student 5)
+/notification-service/        @Student5
+
+# Frontend client app (Student Lead)
+/client-app/                  @StudentLead
+
+# Shared documentation (all students — Lead has final say)
+/docs/                        @StudentLead @Student2 @Student3 @Student4 @Student5
+
+# Helper scripts
+/scripts/                     @StudentLead

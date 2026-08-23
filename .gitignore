@@ -1,0 +1,50 @@
+# ================================
+# SOC Monorepo — Root .gitignore
+# ================================
+
+# Maven build artifacts
+**/target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Environment / secrets — NEVER commit real credentials
+.env
+*.env.local
+*.env.production
+
+# IDE — IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE — VS Code
+.vscode/
+*.code-workspace
+
+# IDE — Eclipse / STS
+.classpath
+.project
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker override files (local overrides should not be committed)
+docker-compose.override.yml
+
+# Maven wrapper
+!.mvn/wrapper/maven-wrapper.properties
