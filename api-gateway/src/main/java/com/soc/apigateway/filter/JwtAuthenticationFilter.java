@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
         String path = request.getURI().getPath();
 
         if (isInvalidPath(rawPath, path)) {
-            return onError(exchange, "Access Denied: Invalid path traversal or forbidden characters detected", HttpStatus.BAD_REQUEST);
+            return onError(exchange, "Access Denied: Invalid path traversal or forbidden characters detected", HttpStatus.UNAUTHORIZED);
         }
 
         if (isOpenEndpoint(path)) {
