@@ -6,7 +6,7 @@ spring:
     name: order-service
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27019/order_db}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://admin:adminpassword@localhost:27019/order_db?authSource=admin}
       auto-index-creation: true
 
 springdoc:
