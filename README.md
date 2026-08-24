@@ -1,6 +1,6 @@
-﻿<div align="center">
+<div align="center">
 
-# ðŸ›’ SOC â€” Online E-Commerce & Delivery System
+# 🛒 SOC — Online E-Commerce & Delivery System
 
 ### Enterprise-grade, security-hardened microservices platform
 
@@ -18,7 +18,7 @@
 
 ---
 
-## ðŸ“‹ Table of Contents
+## 📋 Table of Contents
 
 - [Overview](#-overview)
 - [Key Features](#-key-features)
@@ -37,47 +37,47 @@
 
 ---
 
-## ðŸŒ Overview
+## 🌐 Overview
 
-**SOC** is a fully secured, enterprise-grade **Online E-Commerce & Delivery Platform** built as a distributed microservices system using **Java 17** and **Spring Boot 3.2.3**. All external traffic is funneled through a hardened **Spring Cloud Gateway** that enforces rate-limiting, path-traversal rejection, JWT signature validation, and role header injection â€” before requests ever reach an internal service.
+**SOC** is a fully secured, enterprise-grade **Online E-Commerce & Delivery Platform** built as a distributed microservices system using **Java 17** and **Spring Boot 3.2.3**. All external traffic is funneled through a hardened **Spring Cloud Gateway** that enforces rate-limiting, path-traversal rejection, JWT signature validation, and role header injection — before requests ever reach an internal service.
 
 The platform was developed as part of the **SOC (Service-Oriented Computing)** course and demonstrates production-grade patterns including Zero-Trust networking, OWASP-aligned security hardening, CI/CD pipelines, and database-per-service isolation.
 
 ---
 
-## âœ¨ Key Features
+## ✨ Key Features
 
-- **5 Independent Microservices** â€” each with its own isolated MongoDB instance, no shared state
-- **Zero-Trust Security Model** â€” JWT Bearer tokens, constant-time API key validation, RBAC, and BOLA/IDOR ownership checks at every layer
-- **HMAC-SHA256 Webhook Signatures** â€” cryptographically verified payment callbacks
-- **14 Security Vulnerabilities Resolved** â€” comprehensive OWASP audit with phased remediation
-- **Sliding-Window Rate Limiting** â€” 60 req/min per IP with anti-X-Forwarded-For spoofing
-- **Docker Compose One-Command Deployment** â€” 11 containers (6 services + 5 MongoDB instances) on an isolated private bridge network
-- **Full CI/CD Pipeline** â€” GitHub Actions with automated tests and OWASP Dependency-Check on every push
+- **5 Independent Microservices** — each with its own isolated MongoDB instance, no shared state
+- **Zero-Trust Security Model** — JWT Bearer tokens, constant-time API key validation, RBAC, and BOLA/IDOR ownership checks at every layer
+- **HMAC-SHA256 Webhook Signatures** — cryptographically verified payment callbacks
+- **14 Security Vulnerabilities Resolved** — comprehensive OWASP audit with phased remediation
+- **Sliding-Window Rate Limiting** — 60 req/min per IP with anti-X-Forwarded-For spoofing
+- **Docker Compose One-Command Deployment** — 11 containers (6 services + 5 MongoDB instances) on an isolated private bridge network
+- **Full CI/CD Pipeline** — GitHub Actions with automated tests and OWASP Dependency-Check on every push
 - **Swagger UI** on every service for interactive API exploration
-- **DTO Anti-Mass-Assignment Layer** â€” decoupled request/response contracts with Jakarta Bean Validation
-- **Profile-Gated Data Seeders** â€” `@Profile("!prod")` ensures dev fixtures never run in production
+- **DTO Anti-Mass-Assignment Layer** — decoupled request/response contracts with Jakarta Bean Validation
+- **Profile-Gated Data Seeders** — `@Profile("!prod")` ensures dev fixtures never run in production
 
 ---
 
-## ðŸ“ System Architecture
+## 🏗️ System Architecture
 
 All client requests enter through the centralized **Spring Cloud Gateway** (`Port 8080`). The Gateway enforces rate limiting with trusted proxy validation, rejects path traversal sequences, validates JWT signatures, and enriches requests with user identity headers before forwarding them over the private bridge network (`soc-internal-net`).
 
 ```mermaid
 flowchart TD
-    Client[ðŸ“± Client App / Postman / Frontend]
+    Client["📱 Client App / Postman / Frontend"]
 
-    subgraph GatewayLayer ["ðŸšª Perimeter Gateway Layer"]
-        Gateway["âš™ï¸ API Gateway (Port 8080)<br/>â€¢ AntPathMatcher Whitelist<br/>â€¢ Anti-Traversal Protection (.., ;, %2f)<br/>â€¢ Sliding-Window Rate Limiter (60 req/min)<br/>â€¢ JWT Validation & Downstream Header Injection<br/>â€¢ Restricted CORS (localhost:3000 only)"]
+    subgraph GatewayLayer ["🚪 Perimeter Gateway Layer"]
+        Gateway["⚙️ API Gateway (Port 8080)<br/>• AntPathMatcher Whitelist<br/>• Anti-Traversal Protection (.., ;, %2f)<br/>• Sliding-Window Rate Limiter (60 req/min)<br/>• JWT Validation & Downstream Header Injection<br/>• Restricted CORS (localhost:3000 only)"]
     end
 
-    subgraph InternalNetwork ["ðŸ”’ Isolated Docker Network (soc-internal-net)"]
-        AuthService["ðŸ” Auth Service (Port 8084)<br/>â€¢ JWT Generation (HMAC-SHA256)<br/>â€¢ BCrypt Password Hashing<br/>â€¢ Non-Prod Seeders (@Profile('!prod'))"]
-        ProductService["ðŸ“¦ Product Service (Port 8081)<br/>â€¢ Catalog CRUD & Admin RBAC<br/>â€¢ Constant-Time API Key Validation"]
-        OrderService["ðŸ›’ Order Service (Port 8082)<br/>â€¢ Order Placement & Lifecycle<br/>â€¢ Ownership Verification (BOLA/IDOR)<br/>â€¢ HMAC-SHA256 Webhook Signatures"]
-        PaymentService["ðŸ’³ Payment Service (Port 8083)<br/>â€¢ Payment DTO Layer & Validation<br/>â€¢ Admin-Only Refunds<br/>â€¢ User History Ownership Verification"]
-        NotificationService["ðŸ”” Notification Service (Port 8085)<br/>â€¢ Decoupled DTO Dispatches<br/>â€¢ Email & SMS Alert Logs"]
+    subgraph InternalNetwork ["🔒 Isolated Docker Network (soc-internal-net)"]
+        AuthService["🔐 Auth Service (Port 8084)<br/>• JWT Generation (HMAC-SHA256)<br/>• BCrypt Password Hashing<br/>• Non-Prod Seeders (@Profile('!prod'))"]
+        ProductService["📦 Product Service (Port 8081)<br/>• Catalog CRUD & Admin RBAC<br/>• Constant-Time API Key Validation"]
+        OrderService["🛒 Order Service (Port 8082)<br/>• Order Placement & Lifecycle<br/>• Ownership Verification (BOLA/IDOR)<br/>• HMAC-SHA256 Webhook Signatures"]
+        PaymentService["💳 Payment Service (Port 8083)<br/>• Payment DTO Layer & Validation<br/>• Admin-Only Refunds<br/>• User History Ownership Verification"]
+        NotificationService["🔔 Notification Service (Port 8085)<br/>• Decoupled DTO Dispatches<br/>• Email & SMS Alert Logs"]
 
         DB1[(auth_db)]
         DB2[(product_db)]
@@ -137,7 +137,7 @@ sequenceDiagram
 
 ---
 
-## ðŸ—ï¸ Technology Stack
+## 🛠️ Technology Stack
 
 | Component | Technology | Version |
 |---|---|:---:|
@@ -147,23 +147,23 @@ sequenceDiagram
 | JWT Library | JJWT | 0.11.5 |
 | Database | MongoDB | 7.0 |
 | Containerization | Docker + Docker Compose | 3.8 |
-| API Documentation | SpringDoc OpenAPI / Swagger UI | â€” |
-| Code Generation | Lombok | â€” |
-| Bean Validation | Jakarta Validation | â€” |
-| Testing | JUnit 5 + Mockito + Reactor Test | â€” |
+| API Documentation | SpringDoc OpenAPI / Swagger UI | — |
+| Code Generation | Lombok | — |
+| Bean Validation | Jakarta Validation | — |
+| Testing | JUnit 5 + Mockito + Reactor Test | — |
 | Vulnerability Scan | OWASP Dependency-Check Maven Plugin | 9.0.9 |
-| CI/CD | GitHub Actions | â€” |
-| Build Tool | Maven Wrapper (`mvnw`) | â€” |
+| CI/CD | GitHub Actions | — |
+| Build Tool | Maven Wrapper (`mvnw`) | — |
 
 ---
 
-## ðŸ‘¥ Microservices & Database Architecture
+## 👥 Microservices & Database Architecture
 
-The platform follows the **Database-per-Service** pattern. Each microservice owns a dedicated MongoDB container that does **not** expose a public host port â€” all database communication happens exclusively within the `soc-internal-net` private bridge network with root authentication enabled.
+The platform follows the **Database-per-Service** pattern. Each microservice owns a dedicated MongoDB container that does **not** expose a public host port — all database communication happens exclusively within the `soc-internal-net` private bridge network with root authentication enabled.
 
 | Role | Microservice | Service Port | Database | Internal Mongo Host | Security Layer |
 |---|---|:---:|:---:|---|---|
-| **Lead â€” Gateway & Auth** | API Gateway + Auth Service | `8080` / `8084` | `auth_db` | `mongo-auth:27017` | JWT, AntPathMatcher Whitelist, Rate Limiter |
+| **Lead — Gateway & Auth** | API Gateway + Auth Service | `8080` / `8084` | `auth_db` | `mongo-auth:27017` | JWT, AntPathMatcher Whitelist, Rate Limiter |
 | **Product Catalog** | Product Service | `8081` | `product_db` | `mongo-product:27017` | `X-API-KEY` Constant-Time, `ROLE_ADMIN` RBAC |
 | **Order Management** | Order Service | `8082` | `order_db` | `mongo-order:27017` | `X-API-KEY`, HMAC-SHA256 Webhooks, BOLA/IDOR |
 | **Payment Processing** | Payment Service | `8083` | `payment_db` | `mongo-payment:27017` | `X-API-KEY`, DTO Layer, Admin-Only Refunds |
@@ -171,32 +171,32 @@ The platform follows the **Database-per-Service** pattern. Each microservice own
 
 ---
 
-## ðŸ›¡ï¸ Security Hardening
+## 🛡️ Security Hardening
 
 All **14 security vulnerabilities** identified in the [Security & QA Audit Report](docs/security-audit-report.md) have been resolved across 4 phased patches:
 
 | Phase | Security Patch | Status |
 |---|---|:---:|
-| **1** | Database network isolation â€” no public host ports on MongoDB containers | âœ… |
-| **1** | `AntPathMatcher` whitelist + path traversal hardening in Gateway JWT filter | âœ… |
-| **1** | All secrets externalized to `.env` with `@Value` injection | âœ… |
-| **1** | Constant-time `MessageDigest.isEqual` API key validation (prevents timing attacks) | âœ… |
-| **2** | `ROLE_ADMIN` RBAC on product write/delete and payment refund endpoints | âœ… |
-| **2** | BOLA/IDOR ownership checks on orders and payment history | âœ… |
-| **2** | HMAC-SHA256 webhook signature verification for payment callbacks | âœ… |
-| **2** | CORS restricted to explicit trusted origins (`localhost:3000`) | âœ… |
-| **2** | Rate limiting with trusted proxy subnet validation (anti-`X-Forwarded-For` spoofing) | âœ… |
-| **3** | `@Profile("!prod")` guard on all `DataInitializer` seeders | âœ… |
-| **3** | Decoupled DTO layer for Payment & Notification (anti-mass assignment) | âœ… |
-| **3** | Centralized `GlobalExceptionHandler` across all services | âœ… |
-| **4** | Unit & Mockito regression test suites for all microservices | âœ… |
-| **4** | GitHub Actions CI/CD + OWASP Dependency-Check integration | âœ… |
+| **1** | Database network isolation — no public host ports on MongoDB containers | ✅ |
+| **1** | `AntPathMatcher` whitelist + path traversal hardening in Gateway JWT filter | ✅ |
+| **1** | All secrets externalized to `.env` with `@Value` injection | ✅ |
+| **1** | Constant-time `MessageDigest.isEqual` API key validation (prevents timing attacks) | ✅ |
+| **2** | `ROLE_ADMIN` RBAC on product write/delete and payment refund endpoints | ✅ |
+| **2** | BOLA/IDOR ownership checks on orders and payment history | ✅ |
+| **2** | HMAC-SHA256 webhook signature verification for payment callbacks | ✅ |
+| **2** | CORS restricted to explicit trusted origins (`localhost:3000`) | ✅ |
+| **2** | Rate limiting with trusted proxy subnet validation (anti-`X-Forwarded-For` spoofing) | ✅ |
+| **3** | `@Profile("!prod")` guard on all `DataInitializer` seeders | ✅ |
+| **3** | Decoupled DTO layer for Payment & Notification (anti-mass assignment) | ✅ |
+| **3** | Centralized `GlobalExceptionHandler` across all services | ✅ |
+| **4** | Unit & Mockito regression test suites for all microservices | ✅ |
+| **4** | GitHub Actions CI/CD + OWASP Dependency-Check integration | ✅ |
 
 > See [Security Architecture](docs/architecture/security.md) and [Remediation Plan](docs/remediation-plan.md) for full details.
 
 ---
 
-## ðŸš€ Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -206,7 +206,7 @@ All **14 security vulnerabilities** identified in the [Security & QA Audit Repor
 | Java JDK | 17+ | Local development |
 | Maven | 3.8+ (or use included `mvnw`) | Build tool |
 | Git | any | Source code management |
-| MongoDB Compass | any | Optional â€” GUI for database inspection |
+| MongoDB Compass | any | Optional — GUI for database inspection |
 
 ### 1. Clone the Repository
 
@@ -270,17 +270,17 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-## ðŸ”Œ Service URLs & Swagger UI
+## 🔌 Service URLs & Swagger UI
 
 | Service | Local URL | Swagger UI |
 |---|---|---|
-| **API Gateway** | http://localhost:8080 | â€” |
-| **Auth Service** | http://localhost:8084 | â€” |
+| **API Gateway** | http://localhost:8080 | — |
+| **Auth Service** | http://localhost:8084 | — |
 | **Product Service** | http://localhost:8081 | http://localhost:8081/swagger-ui.html |
 | **Order Service** | http://localhost:8082 | http://localhost:8082/swagger-ui.html |
 | **Payment Service** | http://localhost:8083 | http://localhost:8083/swagger-ui.html |
 | **Notification Service** | http://localhost:8085 | http://localhost:8085/swagger-ui.html |
-| **Client App** | http://localhost:3000 | â€” |
+| **Client App** | http://localhost:3000 | — |
 
 ### MongoDB Compass (Direct Database Inspection)
 
@@ -294,9 +294,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-## ðŸ“¡ REST API Reference
+## 📡 REST API Reference
 
-### ðŸšª API Gateway (`Port 8080`)
+### 🚪 API Gateway (`Port 8080`)
 
 | Route Prefix | Forwarded To | Security Applied |
 |---|---|---|
@@ -308,9 +308,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-### ðŸ” Auth Service (`Port 8084`)
+### 🔐 Auth Service (`Port 8084`)
 
-**Database:** `auth_db` Â· **Security:** Spring Security + BCrypt + JJWT HMAC-SHA256
+**Database:** `auth_db` · **Security:** Spring Security + BCrypt + JJWT HMAC-SHA256
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
@@ -320,9 +320,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-### ðŸ“¦ Product Service (`Port 8081`)
+### 📦 Product Service (`Port 8081`)
 
-**Database:** `product_db` Â· **Security:** Constant-time `X-API-KEY` + `ROLE_ADMIN` RBAC
+**Database:** `product_db` · **Security:** Constant-time `X-API-KEY` + `ROLE_ADMIN` RBAC
 
 | Method | Endpoint | Description | Auth | Role |
 |---|---|---|---|:---:|
@@ -333,9 +333,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-### ðŸ›’ Order Service (`Port 8082`)
+### 🛒 Order Service (`Port 8082`)
 
-**Database:** `order_db` Â· **Security:** BOLA/IDOR ownership checks + HMAC-SHA256 webhook verification
+**Database:** `order_db` · **Security:** BOLA/IDOR ownership checks + HMAC-SHA256 webhook verification
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
@@ -349,9 +349,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-### ðŸ’³ Payment Service (`Port 8083`)
+### 💳 Payment Service (`Port 8083`)
 
-**Database:** `payment_db` Â· **Security:** DTO Layer + IDOR protection + Admin-only refunds
+**Database:** `payment_db` · **Security:** DTO Layer + IDOR protection + Admin-only refunds
 
 | Method | Endpoint | Description | Auth | Role |
 |---|---|---|---|:---:|
@@ -362,9 +362,9 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-### ðŸ”” Notification Service (`Port 8085`)
+### 🔔 Notification Service (`Port 8085`)
 
-**Database:** `notification_db` Â· **Security:** DTO-decoupled dispatches with Bean Validation
+**Database:** `notification_db` · **Security:** DTO-decoupled dispatches with Bean Validation
 
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
@@ -375,7 +375,7 @@ docker compose down -v     # Stop and remove all data
 
 ---
 
-## ðŸ§ª API Testing Guide
+## 🧪 API Testing Guide
 
 All requests route through the API Gateway at `http://localhost:8080`.
 
@@ -395,7 +395,7 @@ sequenceDiagram
 
     C->>GW: 2. POST /api/auth/login
     GW->>AUTH: Forward (whitelist)
-    AUTH-->>C: {token} â† save JWT
+    AUTH-->>C: {token} <- save JWT
 
     C->>GW: 3. GET /api/products (Bearer JWT)
     GW->>PROD: Forward + X-API-KEY injected
@@ -418,7 +418,7 @@ sequenceDiagram
     NOTIF-->>C: {type: EMAIL, status: SENT}
 ```
 
-### Step 1 â€” Register & Login
+### Step 1 — Register & Login
 
 ```bash
 # Register an admin user
@@ -432,7 +432,7 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{"username":"alice_admin","password":"AdminPass123!"}'
 ```
 
-### Step 2 â€” Browse Products & Place Order
+### Step 2 — Browse Products & Place Order
 
 ```bash
 # List products
@@ -455,7 +455,7 @@ curl -X POST http://localhost:8080/api/v1/orders \
   }'
 ```
 
-### Step 3 â€” Payment Webhook (HMAC-SHA256)
+### Step 3 — Payment Webhook (HMAC-SHA256)
 
 ```bash
 # Compute HMAC-SHA256 signature
@@ -487,39 +487,39 @@ curl -X POST http://localhost:8080/api/v1/orders/<ORDER_ID>/payment-webhook \
 
 ---
 
-## ðŸ“ Project Structure
+## 🗂️ Project Structure
 
 ```
 SOC/
-â”œâ”€â”€ api-gateway/              # Spring Cloud Gateway â€” JWT, rate limiting, routing, CORS
-â”œâ”€â”€ auth-service/             # Authentication â€” JWT issuance, BCrypt, user management
-â”œâ”€â”€ product-service/          # Product catalog CRUD with ROLE_ADMIN RBAC
-â”œâ”€â”€ order-service/            # Order lifecycle, HMAC webhooks, BOLA/IDOR protection
-â”œâ”€â”€ payment-service/          # Payment processing, refunds, IDOR protection
-â”œâ”€â”€ notification-service/     # Email & SMS notification dispatch
-â”œâ”€â”€ client-app/               # Static frontend served via Nginx (port 3000)
-â”œâ”€â”€ docs/
-â”‚   â”œâ”€â”€ architecture/
-â”‚   â”‚   â”œâ”€â”€ overview.md       # System architecture, design patterns, tech stack
-â”‚   â”‚   â”œâ”€â”€ security.md       # JWT flow, HMAC, RBAC, rate limiting, filter chain
-â”‚   â”‚   â””â”€â”€ data-models.md    # MongoDB collections and document schemas
-â”‚   â”œâ”€â”€ guides/
-â”‚   â”‚   â”œâ”€â”€ deployment.md     # Docker Compose, local Maven, CI/CD, troubleshooting
-â”‚   â”‚   â””â”€â”€ api-testing.md    # 15-step end-to-end cURL testing guide
-â”‚   â”œâ”€â”€ services/             # Per-service detailed API documentation
-â”‚   â”œâ”€â”€ postman/              # Postman collection for Order Service
-â”‚   â”œâ”€â”€ security-audit-report.md   # Full vulnerability audit & risk matrix
-â”‚   â””â”€â”€ remediation-plan.md        # Phased patching roadmap & verification commands
-â”œâ”€â”€ scripts/                  # Helper build & test automation scripts
-â”œâ”€â”€ docker-compose.yml        # Full ecosystem orchestration (11 containers)
-â”œâ”€â”€ .env.example              # Environment variable template
-â”œâ”€â”€ CONTRIBUTING.md
-â””â”€â”€ README.md
+├── api-gateway/              # Spring Cloud Gateway — JWT, rate limiting, routing, CORS
+├── auth-service/             # Authentication — JWT issuance, BCrypt, user management
+├── product-service/          # Product catalog CRUD with ROLE_ADMIN RBAC
+├── order-service/            # Order lifecycle, HMAC webhooks, BOLA/IDOR protection
+├── payment-service/          # Payment processing, refunds, IDOR protection
+├── notification-service/     # Email & SMS notification dispatch
+├── client-app/               # Static frontend served via Nginx (port 3000)
+├── docs/
+│   ├── architecture/
+│   │   ├── overview.md       # System architecture, design patterns, tech stack
+│   │   ├── security.md       # JWT flow, HMAC, RBAC, rate limiting, filter chain
+│   │   └── data-models.md    # MongoDB collections and document schemas
+│   ├── guides/
+│   │   ├── deployment.md     # Docker Compose, local Maven, CI/CD, troubleshooting
+│   │   └── api-testing.md    # 15-step end-to-end cURL testing guide
+│   ├── services/             # Per-service detailed API documentation
+│   ├── postman/              # Postman collection for Order Service
+│   ├── security-audit-report.md   # Full vulnerability audit & risk matrix
+│   └── remediation-plan.md        # Phased patching roadmap & verification commands
+├── scripts/                  # Helper build & test automation scripts
+├── docker-compose.yml        # Full ecosystem orchestration (11 containers)
+├── .env.example              # Environment variable template
+├── CONTRIBUTING.md
+└── README.md
 ```
 
 ---
 
-## ðŸ“š Documentation
+## 📚 Documentation
 
 | Document | Description |
 |---|---|
@@ -539,14 +539,14 @@ SOC/
 
 ---
 
-## ðŸ¤ Contributing
+## 🤝 Contributing
 
 We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for our workflow, conventions, and standards:
 
-- **Git Workflow** â€” GitHub Flow with PR-based merging; `main` is always deployable
-- **Commit Convention** â€” [Conventional Commits](https://www.conventionalcommits.org/) (`feat`, `fix`, `security`, `docs`, `chore`)
-- **Branch Naming** â€” `feat/short-desc`, `fix/issue-desc`, `security/patch-desc`
-- **Code Standards** â€” Java 17, Bean Validation on all DTOs, `@Profile("!prod")` on seeders, no plaintext secrets
+- **Git Workflow** — GitHub Flow with PR-based merging; `main` is always deployable
+- **Commit Convention** — [Conventional Commits](https://www.conventionalcommits.org/) (`feat`, `fix`, `security`, `docs`, `chore`)
+- **Branch Naming** — `feat/short-desc`, `fix/issue-desc`, `security/patch-desc`
+- **Code Standards** — Java 17, Bean Validation on all DTOs, `@Profile("!prod")` on seeders, no plaintext secrets
 
 ```bash
 git clone https://github.com/mrawfulshadow/SOC_project.git
@@ -557,7 +557,7 @@ docker compose up --build -d
 
 ---
 
-## ðŸ“„ License
+## 📄 License
 
 Developed as part of the **SOC (Service-Oriented Computing)** course project.  
 All contributions are subject to the project's academic integrity guidelines.
@@ -566,6 +566,6 @@ All contributions are subject to the project's academic integrity guidelines.
 
 <div align="center">
 
-**Built with Java 17 Â· Spring Boot 3.2.3 Â· Spring Cloud Gateway Â· MongoDB 7.0 Â· Docker**
+**Built with Java 17 · Spring Boot 3.2.3 · Spring Cloud Gateway · MongoDB 7.0 · Docker**
 
 </div>

@@ -14,7 +14,7 @@ services:
       dockerfile: Dockerfile
     container_name: client-app
     ports:
-      - "3000:80"
+      - "3500:80"
     networks:
       - soc-internal-net
     restart: always
