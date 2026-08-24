@@ -50,6 +50,57 @@ spring:
           predicates:
             - Path=/api/notifications/**
 
+        # OpenAPI / Swagger Documentation Aggregation Routes
+        - id: auth-service-docs
+          uri: ${AUTH_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/v3/api-docs/auth
+          filters:
+            - RewritePath=/v3/api-docs/auth, /v3/api-docs
+
+        - id: product-service-docs
+          uri: ${PRODUCT_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/v3/api-docs/product
+          filters:
+            - RewritePath=/v3/api-docs/product, /v3/api-docs
+
+        - id: order-service-docs
+          uri: ${ORDER_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/v3/api-docs/order
+          filters:
+            - RewritePath=/v3/api-docs/order, /v3/api-docs
+
+        - id: payment-service-docs
+          uri: ${PAYMENT_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/v3/api-docs/payment
+          filters:
+            - RewritePath=/v3/api-docs/payment, /v3/api-docs
+
+        - id: notification-service-docs
+          uri: ${NOTIFICATION_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/v3/api-docs/notification
+          filters:
+            - RewritePath=/v3/api-docs/notification, /v3/api-docs
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: 1. Authentication Service
+        url: /v3/api-docs/auth
+      - name: 2. Product Catalog Service
+        url: /v3/api-docs/product
+      - name: 3. Order Management Service
+        url: /v3/api-docs/order
+      - name: 4. Payment Processing Service
+        url: /v3/api-docs/payment
+      - name: 5. Notification Service
+        url: /v3/api-docs/notification
+
 jwt:
   secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
   expiration: ${JWT_EXPIRATION:86400000}
