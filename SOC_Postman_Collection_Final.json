@@ -1,0 +1,334 @@
+{
+	"info": {
+		"_postman_id": "soc-microservices-system-final",
+		"name": "SOC Microservices System (Final - API Keys Included)",
+		"description": "Complete Postman Collection for all 5 Microservices with Auto-saving JWT and API Keys.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8888",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "orderId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Authentication (Auth Service)",
+			"item": [
+				{
+					"name": "1.1 Login as Admin (Auto-saves JWT Token)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('jwt_token', jsonData.token);",
+									"    console.log('Saved JWT Token: ' + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.2 Login as Standard User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.token) {",
+									"    pm.collectionVariables.set('jwt_token', jsonData.token);",
+									"    console.log('Saved User JWT Token: ' + jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "1.3 Register New User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"kasun_perera\",\n  \"email\": \"kasun@example.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"ROLE_USER\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "register"]
+						}
+					}
+				},
+				{
+					"name": "1.4 Validate JWT Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/validate?token={{jwt_token}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "validate"],
+							"query": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Product Catalog (Product Service)",
+			"item": [
+				{
+					"name": "2.1 Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-KEY",
+								"value": "PRODUCT-SERVICE-SECRET-KEY"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						}
+					}
+				},
+				{
+					"name": "2.2 Create New Product (Admin Only)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-API-KEY",
+								"value": "PRODUCT-SERVICE-SECRET-KEY"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Apple MacBook Pro M3\",\n  \"description\": \"16GB Unified RAM, 512GB SSD Space Gray\",\n  \"price\": 1999.00,\n  \"stockQuantity\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Orders (Order Service)",
+			"item": [
+				{
+					"name": "3.1 Place New Order",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.collectionVariables.set('orderId', jsonData.data.id);",
+									"    console.log('Saved orderId: ' + jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-API-KEY",
+								"value": "order-secret-key-123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": \"CUST-1001\",\n  \"customerEmail\": \"admin@example.com\",\n  \"customerPhone\": \"+94771234567\",\n  \"shippingAddress\": {\n    \"street\": \"45 Galle Road\",\n    \"city\": \"Colombo\",\n    \"state\": \"Western\",\n    \"zipCode\": \"00300\",\n    \"country\": \"Sri Lanka\"\n  },\n  \"items\": [\n    {\n      \"productId\": \"PROD-01\",\n      \"productName\": \"Gaming Laptop\",\n      \"unitPrice\": 1200.00,\n      \"quantity\": 1\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					}
+				},
+				{
+					"name": "3.2 Get All Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-API-KEY",
+								"value": "order-secret-key-123"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "orders"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Payments (Payment Service)",
+			"item": [
+				{
+					"name": "4.1 Process Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-API-KEY",
+								"value": "payment-secret-key-123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": \"{{orderId}}\",\n  \"userId\": 1,\n  \"amount\": 1200.00,\n  \"paymentMethod\": \"CREDIT_CARD\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/process",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "payments", "process"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Notifications (Notification Service)",
+			"item": [
+				{
+					"name": "5.1 Send Email Notification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-API-KEY",
+								"value": "notification-secret-key-123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": 1,\n  \"orderId\": \"{{orderId}}\",\n  \"recipient\": \"customer@example.com\",\n  \"message\": \"Your order has been placed!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/notifications/email",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "notifications", "email"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

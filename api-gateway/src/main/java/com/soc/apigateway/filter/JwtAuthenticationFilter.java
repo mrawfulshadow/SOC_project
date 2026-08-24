@@ -56,8 +56,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        String rawPath = request.getURI().getRawPath();
-        String path = request.getURI().getPath();
+        String rawPath = request.getURI().getRawPath() != null ? request.getURI().getRawPath().trim() : null;
+        String path = request.getURI().getPath() != null ? request.getURI().getPath().trim() : null;
 
         if (isInvalidPath(rawPath, path)) {
             return onError(exchange, "Access Denied: Invalid path traversal or forbidden characters detected", HttpStatus.UNAUTHORIZED);
