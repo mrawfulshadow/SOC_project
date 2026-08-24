@@ -69,6 +69,8 @@ services:
     image: mongo:7.0
     container_name: auth-mongodb
     restart: always
+    ports:
+      - "27022:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-admin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-adminpassword}
@@ -100,6 +102,8 @@ services:
     image: mongo:7.0
     container_name: product-mongodb
     restart: always
+    ports:
+      - "27018:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-admin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-adminpassword}
@@ -131,6 +135,8 @@ services:
     image: mongo:7.0
     container_name: order-mongodb
     restart: always
+    ports:
+      - "27019:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-admin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-adminpassword}
@@ -162,6 +168,8 @@ services:
     image: mongo:7.0
     container_name: payment-mongodb
     restart: always
+    ports:
+      - "27020:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-admin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-adminpassword}
@@ -193,6 +201,8 @@ services:
     image: mongo:7.0
     container_name: notification-mongodb
     restart: always
+    ports:
+      - "27021:27017"
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-admin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-adminpassword}

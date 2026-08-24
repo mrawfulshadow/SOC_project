@@ -46,4 +46,10 @@ public class AuthController {
                     .body(Map.of("valid", false, "message", "Invalid or expired token"));
         }
     }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout user", description = "Invalidates the user session on client side and acknowledges logout")
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        return ResponseEntity.ok(Map.of("message", "User logged out successfully", "status", 200));
+    }
 }
